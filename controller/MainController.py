@@ -1,7 +1,7 @@
 import sys
 import os
 
-# Add the project root directory to sys.path
+# Add the project root directory to sys.path (for importing custom classes)
 sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
 import view.MainView as MainView
@@ -54,10 +54,10 @@ class MainController:
         # Implement hashing and storing logic here (using self.model)
         # For example: password_hash = hashlib.sha512(user_main_password.encode('utf-8')).hexdigest()
         self.user = UserModel(user_name, user_main_password) # --- Pepper use cases.
-        print(self.user.hashed_password)
+        print(self.user.full_hash_value)
         # Establish connection to DB
         self.daoConnect.connect()
-
+        self.daoConnect.create_user(self.user)
         input("Press Enter to go back to the main menu.")
 
     def connect_login(self):

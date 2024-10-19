@@ -1,7 +1,10 @@
 import hashlib
 import argon2
+import sys
+import os
 
-from model.DAO import DAO
+#sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+#from model.DAO import DAO
 
 # defaults constant of minimum limits (reasonable ones) for at least security with the hash
 # Also default and minimum/maximum limits for security
@@ -28,9 +31,22 @@ MAX_SALT_LEN = 32  # Max length of the salt
 class UserModel:
     def __init__(self, username, master_password):
         self.username = username
-        self.hashed_password = self.hash_password(master_password)
-        print(self.username)
-        print('Hashed Password :', self.hashed_password)
+        self.full_hash_value = self.hash_password(master_password)
+        #   Make it an array of parameters for the hashed password (easier to store in DB)
+        self.full_hash_value = self.split_password()
+        #   Create variables to store these parameters in
+        self.algorithm = None
+        self.version = None
+        self.memory_cost = None
+        self.time_cost = None
+        self.parallelism = None
+        self.salt = None
+        self.hash_password = None
+
+        #print(self.username)
+        #print('Hashed Password :', self.hashed_password)
+        #self.daoConnect = DAO()
+        #self.save_user()
 
     def hash_password(self, password):
         # Ask user personnal choices for hashing parameters
@@ -100,15 +116,48 @@ class UserModel:
         # ---  Verify the input password by comparing the hash
         ph = argon2.PasswordHasher()
         try:
-            ph.verify(self.hashed_password, input_password)
+            ph.verify(self.full_hash_value, input_password)
             return True
         except argon2.exceptions.VerifyMismatchError:
             return False
         
+    def split_password(self):
+        # Step 1: delete "$" symbol and divide the string
+        parts = self.full_hash_value.split('$')
+
+        # Ignore the first empty element (because it's empty)
+        parts = parts[1:]
+
+        print(parts)
+        # Get the different parts
+        self.algorithm  = parts[0]  # 'argon2id'
+        self.version = parts[1].split('=')[1]
+
+        # Step 2: divide parameters (m=...,t=...,p=...)
+        params = parts[2].split(',')
+
+        self.memory_cost = params[0].split('=')[1]
+        self.time_cost = params[1].split('=')[1]
+        self.parallelism = params[2].split('=')[1]
+
+        # Step 3: Extract salt & hash
+        self.salt = parts[3]
+        self.hash_password = parts[4]
+
+        # ? Afficher les résultats pour le moments. (à enlever car WIP)
+        print("Algorithm:", self.algorithm)
+        print("Version:", self.version)
+        print("Memory Cost:", self.memory_cost)
+        print("Time Cost:", self.time_cost)
+        print("Parallelism:", self.parallelism)
+        print("Salt:", self.salt)
+        print("Hash:", self.hash_password)
+
     # !!!! DEMANDER SI C'EST BON
-    def save_user(self, db_connection):
-        # Logic to save the user to a database (SQLite)
-        cursor = db_connection.cursor()
-        cursor.execute('INSERT INTO users (username, hashed_password) VALUES (?, ?)',
-                       (self.username, self.hashed_password))
-        db_connection.commit()
+#   def save_user(self):
+#       try:
+#           # Logic to save the user to a database (SQLite)
+#           self.daoConnect.connect()
+#           self.daoConnect.create_user()
+#       except ValueError:
+#                print("\n******************************\nException ! an odd error might occured during the save of user\n******************************")
