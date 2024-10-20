@@ -45,6 +45,7 @@ class DAO:
                 memorycost INTEGER NOT NULL,
                 timecost INTEGER NOT NULL,
                 parallelism INTEGER NOT NULL,
+                salt TEXT NOT NULL,
                 master_password TEXT NOT NULL,
                 FOREIGN KEY (username) REFERENCES User(username)
             )
