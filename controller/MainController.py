@@ -7,6 +7,7 @@ sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')
 import view.MainView as MainView
 
 from model.DAO import DAO
+from model.HashModel import HashModel
 from getpass import getpass # Utility to hide inputs when writing a password
 from model.UserModel import UserModel # Argond2(id) is used in this prototype for better security (longer time for hash)
 #####################################################################################
@@ -51,24 +52,47 @@ class MainController:
             user_main_password = getpass("\nEnter your main password: ")
             user_main_password_again = getpass("\nEnter your main password again: ")
         
-        # Implement hashing and storing logic here (using self.model)
-        # For example: password_hash = hashlib.sha512(user_main_password.encode('utf-8')).hexdigest()
+        #   Implement hashing and storing logic here (using self.model)
+        #   For example: password_hash = hashlib.sha512(user_main_password.encode('utf-8')).hexdigest()
         user = UserModel(user_name, user_main_password) # --- Pepper use cases.
         print(user.full_hash_value)
-        # Establish connection to DB
+        #   Establish connection to DB
         self.daoConnect.connect()
+        print("RAAAAAAAAAAAAAAAAAAH : ", user.hash_len)
+        print("RAAAAAAAAAAAAAAAAAAH : ", user.salt_len)
+
         self.daoConnect.create_user(user)
         input("Press Enter to go back to the main menu.")
 
     def connect_login(self):
-        print("Connect to your login account")
+        print("\n--------Connect to your login account--------")
+        username_input = input("Enter your username/email : ")
         # Implement logic for connecting to an account here...
-        self.DaoConnect.connect()
+        self.daoConnect.connect()
+        user_tuple = self.daoConnect.get_user_by_username(username_input)
 
-        input("Press Enter to go back to the main menu.")
+        # TODO :   Verify if the query is giving something otherwise ask for a username again by prompting an error
+        while user_tuple is None :
+            print("[ERROR] : No user was found with this username, please retry")
+            username_input = input("Enter your username/email : ")
+            user_tuple = self.daoConnect.get_user_by_username(username_input)
+        #   Ask for master password & verify it's authenticity and is veracity
+
+        master_password_input = input("Enter your master password : ")
+        master_password_db = self.daoConnect.get_hashed_master_password(username_input)
+        data_hash_db = self.daoConnect.get_hashing_data(username_input)
+        try:
+            if HashModel.verify_password(data_hash_db, master_password_input, master_password_db):
+                print("\nUser verified !\n")
+            else :
+                print("\nUser denied !\n")
+
+            input("Press Enter to go back to the main menu.")
+        except Exception as e:
+            print("\n[Exception] !", str(e))
 
     def exit_program(self):
-        print("Exiting the program...")
+        print("\nExiting the program...")
         sys.exit(0)
 
 if __name__ == "__main__":

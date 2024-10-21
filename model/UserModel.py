@@ -31,57 +31,76 @@ MAX_SALT_LEN = 32  # Max length of the salt
 class UserModel:
     def __init__(self, username, master_password):
         self.username = username
-        #   Make it an array of parameters for the hashed password (easier to store in DB)
-        self.full_hash_value = self.hash_password(master_password)
-        print("full_hash_value : ", self.full_hash_value)
-
+        
         #   Create variables to store password hashing parameters
+        #   Also making it easier to read in the DAO class
         self.algorithm = None
         self.version = None
         self.memory_cost = None
         self.time_cost = None
         self.parallelism = None
         self.salt = None
-        self.hash_password = None
+        self.hash_len = None
+        self.salt_len = None
+#       self.hash_password = None
+
+        #   Make it an array of parameters for the hashed password (easier to store in DB)
+        self.full_hash_value = self.hash_password(master_password)
+        print("full_hash_value : ", self.full_hash_value)
+
         #   Store variable from the hashed password to these variables
         self.split_password()
-        #print(self.username)
-        #print('Hashed Password :', self.hashed_password)
+
         #self.daoConnect = DAO()
         #self.save_user()
 
     def hash_password(self, password):
-        # Ask user personnal choices for hashing parameters
-        # Use Argon2 to hash the master password (Argon2id would be better to prevent further breach)
-        params = self.get_user_inputs()
-        # Verify if the values are correct for at least a minimum of security
-        validated_params = self.validate_params(params)
+            # Ask user personnal choices for hashing parameters
+            # Use Argon2 to hash the master password (Argon2id would be better to prevent further breach)
+            params = self.get_user_inputs()  # Ensure this method is defined
+            print(params, "\n")
+            # Verify if the values are correct for at least a minimum of security
+            validated_params = self.validate_params(params)
 
-        for x in validated_params:
-            print("VALIDATING PARAMS : " , validated_params[x])
-        # Use Argon2 to hash the master password with validated parameters
-        ph = argon2.PasswordHasher(
-            time_cost = validated_params["time_cost"],
-            memory_cost = validated_params["memory_cost"],
-            parallelism = validated_params["parallelism"],
-            hash_len = validated_params["hash_len"],
-            salt_len = validated_params["salt_len"]
-        )
-        return ph.hash(password)
-
+            for x in validated_params:
+                print("VALIDATING PARAMS:", validated_params[x])
+            print("\n")
+                
+            # Use Argon2 to hash the master password with validated parameters
+            ph = argon2.PasswordHasher(
+                time_cost=validated_params["time_cost"],
+                memory_cost=validated_params["memory_cost"],
+                parallelism=validated_params["parallelism"],
+                hash_len=validated_params["hash_len"],
+                salt_len=validated_params["salt_len"]
+            )
+            return ph.hash(password)
+        
     def get_user_inputs(self):
     #   Prompt user for all hash parameters and return them as a dictionary.
-        params = {
         # ---  means the algorithm takes time to run, making brute-forcing slower.
-            "time_cost": input("\nEnter the time cost of the hash: "),
+        time_cost = input("Enter time cost: ")
         # ---  ensures that an attacker would need significant memory to compute the hash.
-            "memory_cost": input("\nEnter the memory cost of the hash (in KiB): "),
+        memory_cost = input("Enter memory cost (in KiB): ")
         # ---  allows for efficient use of CPU cores for legitimate users, but an attacker would need a lot of CPU power to brute-force.
-            "parallelism": input("\nEnter the parallelism of the hash: "),
-            "hash_len": input("\nEnter the length of the hash: "),
-            "salt_len": input("\nEnter the length of the salt: ")
+        parallelism = input("Enter parallelism of the hash: ")
+        hash_len = input("Enter hash length: ")
+        salt_len = input("Enter salt length: ")
+
+        # Store data about hashing
+        self.time_cost = time_cost
+        self.memory_cost = memory_cost
+        self.parallelism = parallelism
+        self.hash_len = hash_len
+        self.salt_len = salt_len
+
+        return {
+            "time_cost": time_cost,
+            "memory_cost": memory_cost,
+            "parallelism": parallelism,
+            "hash_len": hash_len,
+            "salt_len": salt_len,
         }
-        return params
     
     def validate_params(self, params):
     #   Validate all hash parameters at once.
@@ -111,17 +130,15 @@ class UserModel:
         validated_params["salt_len"] = max(
             min(int(params["salt_len"]) if params["salt_len"] else DEFAULT_SALT_LEN, MAX_SALT_LEN), MIN_SALT_LEN
         )
-
+        
+        #   Store these values in the instance variables
+        self.time_cost = validated_params["time_cost"]
+        self.memory_cost = validated_params["memory_cost"]
+        self.parallelism = validated_params["parallelism"]
+        self.hash_len = validated_params["hash_len"]
+        self.salt_len = validated_params["salt_len"]
+        
         return validated_params
-
-    def verify_password(self, input_password):
-        # ---  Verify the input password by comparing the hash
-        ph = argon2.PasswordHasher()
-        try:
-            ph.verify(self.full_hash_value, input_password)
-            return True
-        except argon2.exceptions.VerifyMismatchError:
-            return False
     
     # ? Peut on mettre cette méthode en static pour être utilitaire à d'autre mdp comme ceux des sites ? (évite d'en avoir deux)
     def split_password(self):
@@ -155,6 +172,8 @@ class UserModel:
         print("Time Cost:", self.time_cost)
         print("Parallelism:", self.parallelism)
         print("Salt:", self.salt)
+        print("Hash_len:", self.hash_len)
+        print("salt_len:", self.salt_len)
         print("Hash:", self.hash_password)
 
     # !!!! DEMANDER SI C'EST BON

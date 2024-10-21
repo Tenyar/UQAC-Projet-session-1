@@ -47,6 +47,8 @@ class DAO:
                 timecost INTEGER NOT NULL,
                 parallelism INTEGER NOT NULL,
                 salt TEXT NOT NULL,
+                hash_len TEXT NOT NULL,
+                salt_len TEXT NOT NULL,
                 master_password TEXT NOT NULL,
                 FOREIGN KEY (username) REFERENCES User(username)
             )
@@ -72,9 +74,9 @@ class DAO:
             
             # Insert into MasterPassword table
             self.cursor.execute('''
-                INSERT INTO MasterPassword (username, algorithm, version, memorycost, timecost, parallelism, salt, master_password) 
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            ''', (user.username, user.algorithm, user.version, user.memory_cost, user.time_cost, user.parallelism, user.salt, user.hash_password))
+                INSERT INTO MasterPassword (username, algorithm, version, memorycost, timecost, parallelism, salt, hash_len, salt_len, master_password) 
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ''', (user.username, user.algorithm, user.version, user.memory_cost, user.time_cost, user.parallelism, user.salt, user.hash_len, user.salt_len, user.hash_password))
             
             self.connection.commit()
             print(f"User {user.username} and master password added to the database.")
@@ -83,25 +85,105 @@ class DAO:
             print(f"Error occurred: {e}")
             
     #   Prepared request for safety (for sql)
-    def get_user(self, user):
+    def get_user_by_username(self, username):
         try:
             # Prepared statement to get the user's details
             self.cursor.execute('''
                 SELECT * FROM User WHERE username = ?
-            ''', (user.username,))
+            ''', (username,))
             
-            user = self.cursor.fetchone()
+            user = self.cursor.fetchone()  # Fetch the result (None if no result) 
             
             if user:
-                print(f"User found: {user}")
+                print(f"\nUser found: {user}\n")
             else:
-                print(f"User {user.username} not found.")
+                print(f"\nUser {username} not found.\n")
 
         except sqlite3.IntegrityError as e:
             print(f"Error occurred: {e}")
 
         return user
+
+    def get_hashed_master_password(self, username):
+        try:
+            # Query to retrieve master_password from MasterPassword table using username
+            self.cursor.execute('''
+                SELECT master_password FROM MasterPassword WHERE username = ?
+            ''', (username,))
             
+            result = self.cursor.fetchone()
+
+            if result:
+                master_password = result[0]  # Extract the master_password from the result
+                print(f"Master password for {username}: {master_password}\n")
+                return master_password
+            else:
+                print(f"No master password found for username: {username}\n")
+                return None
+        except sqlite3.IntegrityError as e:
+            print(f"Error occurred: {e}")
+
+        return None
+    
+    def get_salt(self, username):
+        try:
+            self.cursor.execute('''
+                SELECT salt FROM MasterPassword WHERE username = ?
+            ''', (username,))
+            
+            result = self.cursor.fetchone()
+
+            if result:
+                salt = result[0]
+                print(f"salt  for {username}: {salt}\n")
+                return salt
+            else:
+                print(f"No salt found for username: {username}\n")
+                return None
+        except sqlite3.IntegrityError as e:
+            print(f"Error occurred: {e}")
+
+        return None
+    
+    def get_hashing_data(self, username):
+        try:
+            self.cursor.execute('''
+                SELECT algorithm, version, memorycost, timecost, parallelism, salt, hash_len, salt_len, master_password 
+                FROM MasterPassword WHERE username = ?
+            ''', (username,))
+                
+            result = self.cursor.fetchone()
+
+            if result:
+                algorithm, version, memory_cost, time_cost, parallelism, salt, hash_len, salt_len, master_password = result
+                # !! delete these prints after completion of class (security breach)
+                print(f"Data for {username}:")
+                print(f"Algorithm: {algorithm}")
+                print(f"Version: {version}")
+                print(f"Memory Cost: {memory_cost}")
+                print(f"Time Cost: {time_cost}")
+                print(f"Parallelism: {parallelism}")
+                print(f"Salt: {salt}")
+                print(f"hash_len: {hash_len}")
+                print(f"hash_len: {salt_len}")
+                print(f"Master Password: {master_password}\n")
+                return {
+                    'algorithm': algorithm,
+                    'version': version,
+                    'memory_cost': memory_cost,
+                    'time_cost': time_cost,
+                    'parallelism': parallelism,
+                    'salt': salt,
+                    'master_password': master_password
+                }
+            else:
+                print(f"No data found for username: {username}\n")
+                return None
+        except sqlite3.IntegrityError as e:
+            print(f"Error occurred: {e}")
+
+        return None
+
     def update_master_password(self, user, new_hashed_password):
         try:
             # Update the master password
@@ -157,4 +239,3 @@ class DAO:
 #  def delete(self, data):
 #  
 #  #con = sqlite3.connect("PasswordManager.db")
-#
