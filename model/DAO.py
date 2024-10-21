@@ -35,7 +35,7 @@ class DAO:
         cursor.execute('''
             CREATE TABLE IF NOT EXISTS User (
                 username TEXT PRIMARY KEY,
-                master_password TEXT NOT NULL
+                full_hashed_password TEXT NOT NULL
             )
         ''')
         cursor.execute('''
@@ -49,7 +49,7 @@ class DAO:
                 salt TEXT NOT NULL,
                 hash_len TEXT NOT NULL,
                 salt_len TEXT NOT NULL,
-                master_password TEXT NOT NULL,
+                hashed_password TEXT NOT NULL,
                 FOREIGN KEY (username) REFERENCES User(username)
             )
         ''')
@@ -67,14 +67,15 @@ class DAO:
         
         try:
             # Insert into User table
+            # and not 'user.hash_password'
             self.cursor.execute('''
-                INSERT INTO User (username, master_password) 
+                INSERT INTO User (username, full_hashed_password) 
                 VALUES (?, ?)
-            ''', (user.username, user.hash_password))
+            ''', (user.username, user.full_hash_value))
             
             # Insert into MasterPassword table
             self.cursor.execute('''
-                INSERT INTO MasterPassword (username, algorithm, version, memorycost, timecost, parallelism, salt, hash_len, salt_len, master_password) 
+                INSERT INTO MasterPassword (username, algorithm, version, memorycost, timecost, parallelism, salt, hash_len, salt_len, hashed_password) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ''', (user.username, user.algorithm, user.version, user.memory_cost, user.time_cost, user.parallelism, user.salt, user.hash_len, user.salt_len, user.hash_password))
             
@@ -104,11 +105,32 @@ class DAO:
 
         return user
 
+    def get_fullhashed_master_password(self, username):
+        try:
+            # Query to retrieve master_password from MasterPassword table using username
+            self.cursor.execute('''
+                SELECT full_hashed_password FROM User WHERE username = ?
+            ''', (username,))
+            
+            result = self.cursor.fetchone()
+
+            if result:
+                master_password = result[0]  # Extract the master_password from the result
+                print(f"Master password for {username}: {master_password}\n")
+                return master_password
+            else:
+                print(f"No master password found for username: {username}\n")
+                return None
+        except sqlite3.IntegrityError as e:
+            print(f"Error occurred: {e}")
+
+        return None
+
     def get_hashed_master_password(self, username):
         try:
             # Query to retrieve master_password from MasterPassword table using username
             self.cursor.execute('''
-                SELECT master_password FROM MasterPassword WHERE username = ?
+                SELECT hashed_password FROM MasterPassword WHERE username = ?
             ''', (username,))
             
             result = self.cursor.fetchone()
@@ -148,7 +170,7 @@ class DAO:
     def get_hashing_data(self, username):
         try:
             self.cursor.execute('''
-                SELECT algorithm, version, memorycost, timecost, parallelism, salt, hash_len, salt_len, master_password 
+                SELECT algorithm, version, memorycost, timecost, parallelism, salt, hash_len, salt_len, hashed_password 
                 FROM MasterPassword WHERE username = ?
             ''', (username,))
                 
@@ -167,6 +189,7 @@ class DAO:
                 print(f"hash_len: {hash_len}")
                 print(f"hash_len: {salt_len}")
                 print(f"Master Password: {master_password}\n")
+
                 return {
                     'algorithm': algorithm,
                     'version': version,
@@ -174,6 +197,8 @@ class DAO:
                     'time_cost': time_cost,
                     'parallelism': parallelism,
                     'salt': salt,
+                    'hash_len': hash_len,
+                    'salt_len': salt_len,
                     'master_password': master_password
                 }
             else:
@@ -192,7 +217,7 @@ class DAO:
             ''', (new_hashed_password, user.username))
             
             self.cursor.execute('''
-                UPDATE MasterPassword SET master_password = ? WHERE username = ?
+                UPDATE MasterPassword SET hashed_password = ? WHERE username = ?
             ''', (new_hashed_password, user.username))
             
             self.conection.commit()

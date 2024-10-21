@@ -26,20 +26,17 @@ class MainController:
     def main_menu(self):
         while True:
             self.mainView.mainMenu()  # Call the utility function to display the menu
-            try:
-                choice = int(input("\nEnter your choice: "))  # Convert input to int
-                print('Your choice:', choice)
-                match choice:
-                    case 1:
-                        self.create_login()  # Call the instance method
-                    case 2:
-                        self.connect_login()  # Call the instance method
-                    case 3:
-                        self.exit_program()  # Call the instance method
-                    case _:
-                        print("\n******************************\nInvalid option. Please try again.\n*******************************")
-            except ValueError:
-                print("\n******************************\nException ! an odd error might occured\n******************************")
+            choice = int(input("\nEnter your choice: "))  # Convert input to int
+            print('Your choice:', choice)
+            match choice:
+                case 1:
+                    self.create_login()  # Call the instance method
+                case 2:
+                    self.connect_login()  # Call the instance method
+                case 3:
+                    self.exit_program()  # Call the instance method
+                case _:
+                    print("\n******************************\nInvalid option. Please try again.\n*******************************")
 
     def create_login(self):
         print("Creating a new login")
@@ -58,8 +55,6 @@ class MainController:
         print(user.full_hash_value)
         #   Establish connection to DB
         self.daoConnect.connect()
-        print("RAAAAAAAAAAAAAAAAAAH : ", user.hash_len)
-        print("RAAAAAAAAAAAAAAAAAAH : ", user.salt_len)
 
         self.daoConnect.create_user(user)
         input("Press Enter to go back to the main menu.")
@@ -76,11 +71,13 @@ class MainController:
             print("[ERROR] : No user was found with this username, please retry")
             username_input = input("Enter your username/email : ")
             user_tuple = self.daoConnect.get_user_by_username(username_input)
+            
         #   Ask for master password & verify it's authenticity and is veracity
-
         master_password_input = input("Enter your master password : ")
-        master_password_db = self.daoConnect.get_hashed_master_password(username_input)
+        #master_password_db = self.daoConnect.get_hashed_master_password(username_input)
+        master_password_db = self.daoConnect.get_fullhashed_master_password(username_input)
         data_hash_db = self.daoConnect.get_hashing_data(username_input)
+
         try:
             if HashModel.verify_password(data_hash_db, master_password_input, master_password_db):
                 print("\nUser verified !\n")

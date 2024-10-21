@@ -42,40 +42,40 @@ class UserModel:
         self.salt = None
         self.hash_len = None
         self.salt_len = None
-#       self.hash_password = None
-
         #   Make it an array of parameters for the hashed password (easier to store in DB)
         self.full_hash_value = self.hash_password(master_password)
-        print("full_hash_value : ", self.full_hash_value)
+        # data separated
+        #self.data_hash_value = None
 
         #   Store variable from the hashed password to these variables
         self.split_password()
+        print("full_hash_value : ", self.full_hash_value)
 
         #self.daoConnect = DAO()
         #self.save_user()
 
     def hash_password(self, password):
-            # Ask user personnal choices for hashing parameters
-            # Use Argon2 to hash the master password (Argon2id would be better to prevent further breach)
-            params = self.get_user_inputs()  # Ensure this method is defined
-            print(params, "\n")
-            # Verify if the values are correct for at least a minimum of security
-            validated_params = self.validate_params(params)
+        # Ask user personnal choices for hashing parameters
+        # Use Argon2 to hash the master password (Argon2id would be better to prevent further breach)
+        params = self.get_user_inputs()  # Ensure this method is defined
+        print(params, "\n")
+        # Verify if the values are correct for at least a minimum of security
+        validated_params = self.validate_params(params)
 
-            for x in validated_params:
-                print("VALIDATING PARAMS:", validated_params[x])
-            print("\n")
-                
-            # Use Argon2 to hash the master password with validated parameters
-            ph = argon2.PasswordHasher(
-                time_cost=validated_params["time_cost"],
-                memory_cost=validated_params["memory_cost"],
-                parallelism=validated_params["parallelism"],
-                hash_len=validated_params["hash_len"],
-                salt_len=validated_params["salt_len"]
-            )
-            return ph.hash(password)
-        
+        for x in validated_params:
+            print("VALIDATING PARAMS:", validated_params[x])
+        print("\n")
+            
+        # Use Argon2 to hash the master password with validated parameters
+        ph = argon2.PasswordHasher(
+            time_cost=validated_params["time_cost"],
+            memory_cost=validated_params["memory_cost"],
+            parallelism=validated_params["parallelism"],
+            hash_len=validated_params["hash_len"],
+            salt_len=validated_params["salt_len"]
+        )
+        return ph.hash(password)
+    
     def get_user_inputs(self):
     #   Prompt user for all hash parameters and return them as a dictionary.
         # ---  means the algorithm takes time to run, making brute-forcing slower.
