@@ -53,11 +53,11 @@ class MainController:
         
         # Implement hashing and storing logic here (using self.model)
         # For example: password_hash = hashlib.sha512(user_main_password.encode('utf-8')).hexdigest()
-        self.user = UserModel(user_name, user_main_password) # --- Pepper use cases.
-        print(self.user.full_hash_value)
+        user = UserModel(user_name, user_main_password) # --- Pepper use cases.
+        print(user.full_hash_value)
         # Establish connection to DB
         self.daoConnect.connect()
-        self.daoConnect.create_user(self.user)
+        self.daoConnect.create_user(user)
         input("Press Enter to go back to the main menu.")
 
     def connect_login(self):

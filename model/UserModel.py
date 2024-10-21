@@ -31,10 +31,11 @@ MAX_SALT_LEN = 32  # Max length of the salt
 class UserModel:
     def __init__(self, username, master_password):
         self.username = username
-        self.full_hash_value = self.hash_password(master_password)
         #   Make it an array of parameters for the hashed password (easier to store in DB)
-        self.full_hash_value = self.split_password()
-        #   Create variables to store these parameters in
+        self.full_hash_value = self.hash_password(master_password)
+        print("full_hash_value : ", self.full_hash_value)
+
+        #   Create variables to store password hashing parameters
         self.algorithm = None
         self.version = None
         self.memory_cost = None
@@ -42,7 +43,8 @@ class UserModel:
         self.parallelism = None
         self.salt = None
         self.hash_password = None
-
+        #   Store variable from the hashed password to these variables
+        self.split_password()
         #print(self.username)
         #print('Hashed Password :', self.hashed_password)
         #self.daoConnect = DAO()
@@ -56,7 +58,7 @@ class UserModel:
         validated_params = self.validate_params(params)
 
         for x in validated_params:
-            print(validated_params[x])
+            print("VALIDATING PARAMS : " , validated_params[x])
         # Use Argon2 to hash the master password with validated parameters
         ph = argon2.PasswordHasher(
             time_cost = validated_params["time_cost"],
@@ -120,15 +122,17 @@ class UserModel:
             return True
         except argon2.exceptions.VerifyMismatchError:
             return False
-        
+    
+    # ? Peut on mettre cette méthode en static pour être utilitaire à d'autre mdp comme ceux des sites ? (évite d'en avoir deux)
     def split_password(self):
+        print("entering split Password : ", self.full_hash_value)
         # Step 1: delete "$" symbol and divide the string
         parts = self.full_hash_value.split('$')
 
         # Ignore the first empty element (because it's empty)
         parts = parts[1:]
 
-        print(parts)
+        #print(parts)
         # Get the different parts
         self.algorithm  = parts[0]  # 'argon2id'
         self.version = parts[1].split('=')[1]

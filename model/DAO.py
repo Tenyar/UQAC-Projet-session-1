@@ -17,6 +17,7 @@ class DAO:
             print(f"Database not found. Creating a new one at {"database", self.db_path}.")
             self.connection = sqlite3.connect(self.absolute_path)
             self.create_tables()
+            self.cursor = self.connection.cursor()
         else:
             print(f"Connecting to the existing database at {self.db_path}.")
             self.connection = sqlite3.connect(self.absolute_path)
@@ -71,7 +72,7 @@ class DAO:
             
             # Insert into MasterPassword table
             self.cursor.execute('''
-                INSERT INTO MasterPassword (username, master_password, timecost, memorycost, parallelism, hash_len, salt_len) 
+                INSERT INTO MasterPassword (username, algorithm, version, memorycost, timecost, parallelism, salt, master_password) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             ''', (user.username, user.algorithm, user.version, user.memory_cost, user.time_cost, user.parallelism, user.salt, user.hash_password))
             
