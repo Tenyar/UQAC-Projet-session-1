@@ -3,10 +3,9 @@
 #   (Utility script, containing methods for printing and taking inputs.)
 #  
 #####################################################################################
-def dispaly_main_menu():
-    print("\nPassword Manager")
+def generator_view():
+    print("\nPassword generator")
     print("----------------")
-    # Will have to rewrite that
-    print("1. Create a login")
-    print("2. Connect to account")
-    print("3. Exit")
+    print("1. Generate a password(Générateur un mdp)")
+    print("2. Go back(revenir en arrière)")
+    print("3. Exit(sortir)")
