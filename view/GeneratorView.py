@@ -3,7 +3,7 @@
 #   (Utility script, containing methods for printing and taking inputs.)
 #  
 #####################################################################################
-def generator_view():
+def display_generator_view():
     print("\nPassword generator")
     print("----------------")
     print("1. Generate a password(Générateur un mdp)")

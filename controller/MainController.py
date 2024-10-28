@@ -50,19 +50,19 @@ class MainController:
     def create_login(self):
         print("Creating a new login")
         user_name = input("\nEnter your name/email: ")  # User's name/email
-        user_main_password = getpass("\nEnter your main password: ")
-        user_main_password_again = getpass("\nEnter your main password again: ")
+        user_main_password = getpass("\nEnter your master password: ")
+        user_main_password_again = getpass("\nEnter your master password again: ")
 
         while user_main_password != user_main_password_again:
             print("Passwords do not match. Please try again.")
-            user_main_password = getpass("\nEnter your main password: ")
-            user_main_password_again = getpass("\nEnter your main password again: ")
+            user_main_password = getpass("\nEnter your master password again: ")
+            user_main_password_again = getpass("\nEnter your master password again: ")
         
         #   Implement hashing and storing logic here (using self.model)
         user = UserModel(user_name, user_main_password)
         #   Connect/Create a database in the username folder
         self.daoConnect = DAO(user.username)
-        self.daoConnect.connect(DEFAULT_DB_USER_NAME)
+        self.daoConnect.create_db(DEFAULT_DB_USER_NAME)
 
         #   Establishing connection to the DB is done in this method to be regroup frequent use of the 'connect' method
         self.daoConnect.create_user(user)
@@ -71,22 +71,25 @@ class MainController:
 
     def connect_login(self):
         print("\n--------Connect to your login account--------")
-        username_input = input("Enter your username/email: ")
-
         # Implement logic for connecting to an account here...
+        username_input = input("Enter your username/email: ")
         self.daoConnect = DAO(username_input)
-        self.daoConnect.connect(DEFAULT_DB_USER_NAME)
+
+        while self.daoConnect.connect_db(DEFAULT_DB_USER_NAME) == False:
+            print("\n [ERROR]: User don't exist, please retry \n")
+            username_input = input("Enter your username/email: ")
+            self.daoConnect = DAO(username_input)
+
         user_tuple = self.daoConnect.get_user_by_username(username_input)
 
         #   Verify if the query is giving something otherwise ask for a username again by prompting an error
         while user_tuple is None :
-            print("[ERROR] : No user was found with this username, please retry")
+            print("[ERROR] : No user was found with this username, please retry\n")
             username_input = input("Enter your username/email: ")
             user_tuple = self.daoConnect.get_user_by_username(username_input)
             
         #   Ask for master password & verify it's authenticity and is veracity
-        master_password_input = input("Enter your master password: ")
-        #master_password_db = self.daoConnect.get_hashed_master_password(username_input)
+        master_password_input = getpass("\nEnter your master password: ")
         master_password_db = self.daoConnect.get_fullhashed_master_password(username_input)
         data_hash_db = self.daoConnect.get_hashing_data(username_input)
 
@@ -94,7 +97,7 @@ class MainController:
             if HashModel.verify_password(data_hash_db, master_password_input, master_password_db):
                 print("\nUser verified !\n")
                 # Launch the user menu controller
-                UserMenuController(self).run()
+                UserMenuController(self, username_input).run()
                 self.running = False
             else :
                 print("\nUser denied!\n")

@@ -3,7 +3,7 @@
 #   (Utility script, containing methods for printing and taking inputs.)
 #  
 #####################################################################################
-def user_main_menu():
+def display_user_menu():
     print("\nUser main menu")
     print("----------------")
     print("1. Password Generator(Générateur de mdp)")

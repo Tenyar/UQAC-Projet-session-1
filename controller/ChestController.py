@@ -8,10 +8,6 @@ import UserMenuController
 from utility.ConstantsUtility import (
     DEFAULT_DB_USER_NAME, DEFAULT_DB_PASSWORD_NAME
 )
-from model.DAO import DAO
-from model.HashModel import HashModel
-from getpass import getpass # Utility to hide inputs when writing a password
-from model.UserModel import UserModel # Argond2(id) is used in this prototype for better security (longer time for hash)
 #####################################################################################
 #          #######      #               ##########
 #        #              #                   #
@@ -21,7 +17,9 @@ from model.UserModel import UserModel # Argond2(id) is used in this prototype fo
 #          #######      ########        ##########
 #####################################################################################
 class ChestController:
-    def __init__(self):
+    def __init__(self, UserMenuController, username):
+        self.UserMenuController =UserMenuController
+        self.username = username
         self.running = True
         self.chest_view = chestView
         self.daoConnect = None
@@ -35,25 +33,17 @@ class ChestController:
                 case 1:
                     self.generate_password() # Call the controller of that page
                 case 2:
-                    self.go_back() # Call the instance method
+                    self.go_back() 
                 case 3:
-                    self.exit() # Call the instance method
+                    self.exit()
                 case _:
                     print("\n******************************\nInvalid option. Please try again.\n*******************************")
-
-    def generate_password(self):
-        print('*******  Generating a new password  *******')
-        password_chosen = None
-        password_length = None   # 8 - 128 characters
-        lowercase_alphabet=False    # a-z
-        uppercase_alphabet=False    # a-Z
-        numbers=False  #0-9
-
 
 
     def go_back(self):
         self.running = False
         UserMenuController.run()
+
 
     def exit(self):
         self.running = False

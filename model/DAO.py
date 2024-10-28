@@ -27,7 +27,7 @@ class DAO:
         self.cursor = None
     
 
-    def connect(self, db_type):
+    def create_db(self):
         #   Create the database in the "database/" folder
         #   Connect to the SQLite database. If it doesn't exist, it will be created.
         if not os.path.exists(self.absolute_path_password) and not os.path.exists(self.absolute_path_user):
@@ -53,19 +53,25 @@ class DAO:
 
             self.create_passwords_tables()
             self.create_user_tables()
-        else:
+
+
+    def connect_db(self, db_type):
+        try:
             #   Connect both databases
             self.connection_pswd = sqlite3.connect(self.absolute_path_password)
             self.connection_user = sqlite3.connect(self.absolute_path_user)
-            #   Either connect to the user database or the password database
-            if(db_type == DEFAULT_DB_USER_NAME):
-                print(f"Connecting to the existing database at {self.db_user_name}.")
-                self.connection_user = sqlite3.connect(self.absolute_path_user)
-                self.cursor = self.connection_user.cursor()
-            elif (db_type == DEFAULT_DB_PASSWORD_NAME):
-                print(f"Connecting to the existing database at {self.db_password_name}.")
-                self.connection_pswd = sqlite3.connect(self.absolute_path_password)
-                self.cursor = self.connection_pswd.cursor()
+        except Exception as e:
+            print("\n[Exception]!", str(e))
+            return False
+        #   Either connect to the user database or the password database
+        if(db_type == DEFAULT_DB_USER_NAME):
+            print(f"Connecting to the existing database at {self.db_user_name}.")
+            self.connection_user = sqlite3.connect(self.absolute_path_user)
+            self.cursor = self.connection_user.cursor()
+        elif (db_type == DEFAULT_DB_PASSWORD_NAME):
+            print(f"Connecting to the existing database at {self.db_password_name}.")
+            self.connection_pswd = sqlite3.connect(self.absolute_path_password)
+            self.cursor = self.connection_pswd.cursor()
 
 
     def close(self):

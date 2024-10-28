@@ -74,8 +74,8 @@ class HashModel:
             user.hash_params["hash_len"] = validated_hash_params["hash_len"]
             user.hash_params["salt_len"] = validated_hash_params["salt_len"]
 
-        for x in validated_hash_params:
-            print(r"VALIDATING PARAMS FOR {validated_hash_params[x]} :", validated_hash_params[x])
+        for x,y in validated_hash_params.items():
+            print(f"VALIDATING PARAMS FOR {x} :", {y})
         print("\n")
             
         # Use Argon2 to hash the master password with validated parameters

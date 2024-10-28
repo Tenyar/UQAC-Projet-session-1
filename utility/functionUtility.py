@@ -7,10 +7,8 @@ def get_password_options(params):
     params["numbers"] = get_boolean_input("Include numbers? (y/n): ")
     params["specials_car"] = get_boolean_input("Include special characters? (y/n): ")
     #   if one of these options is true
-    if params["numbers"]:
-        params["min_numbers"] = int(input("Minimum number of digits: ")) if params["min_numbers"] else 0
-    if params["specials_car"]:
-        params["min_specials_car"] = int(input("Minimum number of special characters: ")) if params["min_specials_car"] else 0
+    params["min_numbers"] = int(input("Minimum number of digits: ")) if params["numbers"] == True else 0
+    params["min_specials_car"] = int(input("Minimum number of special characters: ")) if params["specials_car"] == True else 0
 
     # Return all the values
     return params
