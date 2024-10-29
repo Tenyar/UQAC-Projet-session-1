@@ -114,13 +114,6 @@ class DAO:
 
 
     def create_user_tables(self):
-            
-        # !!! Est-ce utile ou de la redondance
-#       cursor.execute('''
-#           CREATE TABLE IF NOT EXISTS User (
-#               username TEXT PRIMARY KEY,
-#           )
-#       ''')
         self.get_db_cursor(DEFAULT_DB_USER_NAME)
         self.cursor.execute('''
             CREATE TABLE IF NOT EXISTS UserData (
@@ -295,9 +288,29 @@ class DAO:
     #//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
     # TODO: ChestController (affiche les password avec les services)
-    #
-    #
-    #def get_service_password()
+    #   get the following data :
+    # service_name 
+    # password 
+    def get_user_service_password(self, username):
+
+        try:
+            # Prepared statement to get the user's details
+            self.get_db_cursor(DEFAULT_DB_USER_NAME)
+            self.cursor.execute('''
+                SELECT service_name, password FROM UserData WHERE username = ?
+            ''', (username,))
+            
+            result = self.cursor.fetchone()  # Fetch the result (None if no result) 
+            
+            if result:
+                print(f"\nUser found: {result}\n")
+            else:
+                print(f"\nUser {username} not found.\n")
+
+        except sqlite3.IntegrityError as e:
+            print(f"Error occurred: {e}")
+
+        return result
 
     
     #//////////////////////////////////////////////////////////////////////////////////////////////////////////

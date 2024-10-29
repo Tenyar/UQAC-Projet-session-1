@@ -11,7 +11,6 @@ from utility.functionUtility import(
 from utility.ConstantsUtility import (
     DEFAULT_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH
 )
-from model.DAO import DAO
 
 class GeneratorModel:
 
@@ -31,10 +30,18 @@ class GeneratorModel:
         "min_numbers" : 0,  # minimum of numbers present in the password
         "min_specials_car" : 0  # minimum of specials characters present in the password
         }
+        #   Parameters for generating a passwords
+        lowercase_pool = None   #   Define a lowercase character pool
+        uppercase_pool = None   #   Define an upper character pool
+        numbers_pool  = None    #   Define a pool of number
+        specials_pool = None    #   Define a pool of number
+        all_chars = None    #   Create a combined pool of characters based on enabled options
+        password = None     #   Where all the characters/numbers/specials are stored
+
 
         #   Immitating a "do while" loop
         while do_while:
-            # Call print_password_options and get the updated values
+            #   Call print_password_options and get the updated values
             params = get_password_options(params)
             #   Verify input (at least one option must be true)
             params = self.verify_password(params)
@@ -49,17 +56,16 @@ class GeneratorModel:
         print("Params after verify_password:", params)
 
         #   Generate a password with the parameters
-        # Define character pools
         lowercase_pool = string.ascii_lowercase if params["lowercase_alphabet"] == True else ""
         uppercase_pool = string.ascii_uppercase if params["uppercase_alphabet"] == True else ""
         numbers_pool  = string.digits if params["numbers"] == True else ""
         specials_pool = "!@#$%^&*()_+-=[]{}|;:',.<>?/" if params["specials_car"] == True else ""
 
-        # Create a combined pool of characters based on enabled options
+        
         all_chars = lowercase_pool + uppercase_pool
         password = []
 
-        # Ensure minimum numbers and special characters
+        #   Ensure minimum numbers and special characters
         if numbers_pool:
             chosen_numbers = random.choices(numbers_pool, k=params["min_numbers"])
             password.extend(chosen_numbers)
@@ -76,7 +82,7 @@ class GeneratorModel:
             return None
 
         if remaining_length > 0:
-        # Fill the remaining length with random characters from the enabled pools
+        #   Fill the remaining length with random characters from the enabled pools
             remaining_chars = random.choices(all_chars, k=remaining_length)
             password.extend(remaining_chars)
             print("Remaining chars:", remaining_chars)  # Debug line
@@ -85,8 +91,8 @@ class GeneratorModel:
         random.shuffle(password)
         #   Join list into a final password string with no separator between each characters
         final_password = ''.join(password)
-        #//print("Generated password:", final_password)
         return final_password
+
 
     def verify_password(self, params):
     #   Validate all hash parameters at once.

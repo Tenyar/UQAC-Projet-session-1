@@ -1,6 +1,3 @@
-import sys
-import os
-
 import view.ChestView as chestView
 import UserMenuController
 
@@ -8,14 +5,6 @@ import UserMenuController
 from utility.ConstantsUtility import (
     DEFAULT_DB_USER_NAME, DEFAULT_DB_PASSWORD_NAME
 )
-#####################################################################################
-#          #######      #               ##########
-#        #              #                   #
-#       #               #                   #
-#       #               #                   #           (command line interface)
-#        #              #                   #
-#          #######      ########        ##########
-#####################################################################################
 class ChestController:
     def __init__(self, UserMenuController, username):
         self.UserMenuController =UserMenuController
@@ -31,13 +20,23 @@ class ChestController:
             print('Your choice:', choice)
             match choice:
                 case 1:
-                    self.generate_password() # Call the controller of that page
+                    self.show_all_user_passwords() # Call the controller of that page
                 case 2:
-                    self.go_back() 
+                    self.find_user_password()
                 case 3:
+                    self.go_back() 
+                case 4:
                     self.exit()
                 case _:
                     print("\n******************************\nInvalid option. Please try again.\n*******************************")
+
+
+    def show_all_user_passwords(self):
+        print("\n--------- All available passwords for different service ---------\n")
+
+    def find_user_password(self):
+        print("\n--------- Password for a service ---------\n")
+
 
 
     def go_back(self):
