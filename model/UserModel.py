@@ -16,14 +16,7 @@ class UserModel:
         #   Create variables to store password hashing parameters
         #   Also making it easier to read in the DAO class
         # !! since it's now an array of variables it's depreciated
-        # self.algorithm = None
-        # self.version = None
-        # self.memory_cost = None
-        # self.time_cost = None
-        # self.parallelism = None
-        # self.salt = None
-        # self.hash_len = None
-        # self.salt_len = None
+        #   Make it an array of parameters for the hashed password (easier to store in DB)
         self.hash_params = {
         "algorithm" : None,
         "version" : None,
@@ -36,8 +29,6 @@ class UserModel:
         "hash" : None
         }
         
-        #   Make it an array of parameters for the hashed password (easier to store in DB)
-        print(master_password)
         #   Dissociate the full hash produced by the function from the list of parameters
         self.full_hash_value = HashModel.hash_password(master_password, self)
 
@@ -48,3 +39,18 @@ class UserModel:
 
     def set_username(self, username):
         self.username = username
+
+    def get_username(self):
+        return self.username
+    
+    def get_full_hash_password(self):
+        return self.full_hash_value
+    
+    def get_all_params(self):
+        return self.hash_params
+
+    def get_param(self, param):
+        return self.hash_params[param]
+    
+    def set_param(self, param, value):
+        self.hash_params[param] = value

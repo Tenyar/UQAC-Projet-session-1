@@ -50,19 +50,27 @@ class MainController:
     def create_login(self):
         print("Creating a new login")
         user_name = input("\nEnter your name/email: ")  # User's name/email
+
+        #   Connect/Create a database in the username folder
+        self.daoConnect = DAO(user_name)
+
+        #   Error management of the unique contraint of a user
+        while self.daoConnect.get_folder_by_username():
+            print(f"[ERROR] : the username {user_name} is arleady taken, please retry : ")
+            user_name = input()
+            self.daoConnect.set_username_folder(user_name)
+
+        self.daoConnect.create_db()
+
         user_main_password = getpass("\nEnter your master password: ")
         user_main_password_again = getpass("\nEnter your master password again: ")
-
         while user_main_password != user_main_password_again:
             print("Passwords do not match. Please try again.")
             user_main_password = getpass("\nEnter your master password again: ")
             user_main_password_again = getpass("\nEnter your master password again: ")
         
-        #   Implement hashing and storing logic here (using self.model)
+        #   Create a user object
         user = UserModel(user_name, user_main_password)
-        #   Connect/Create a database in the username folder
-        self.daoConnect = DAO(user.username)
-        self.daoConnect.create_db(DEFAULT_DB_USER_NAME)
 
         #   Establishing connection to the DB is done in this method to be regroup frequent use of the 'connect' method
         self.daoConnect.create_user(user)

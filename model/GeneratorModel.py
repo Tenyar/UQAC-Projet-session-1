@@ -20,7 +20,6 @@ class GeneratorModel:
 
 
     def generate_password(self):
-
         print('*******  Generating a new password  *******')
         do_while = True
         params = {
@@ -48,38 +47,46 @@ class GeneratorModel:
             if get_boolean_input("do you confirm your choices? (Yes/no): "):
                 do_while = False
         print("Params after verify_password:", params)
+
         #   Generate a password with the parameters
-     # for x in reversed(params["password_length"]):
-     #     if params["numbers"] & params["specials_car"]:
-
-     #     elif
-
         # Define character pools
-        print('TEST 1   TEST 1')
-        lowercase = string.ascii_lowercase if params["lowercase_alphabet"] == True else ""
-        print('TEST 2   TEST 2')
-        uppercase = string.ascii_uppercase if params["uppercase_alphabet"] == True else ""
-        numbers = string.digits if params["numbers"] == True else ""
-        specials = "!@#$%^&*()_+-=[]{}|;:',.<>?/" if params["specials_car"] == True else ""
+        lowercase_pool = string.ascii_lowercase if params["lowercase_alphabet"] == True else ""
+        uppercase_pool = string.ascii_uppercase if params["uppercase_alphabet"] == True else ""
+        numbers_pool  = string.digits if params["numbers"] == True else ""
+        specials_pool = "!@#$%^&*()_+-=[]{}|;:',.<>?/" if params["specials_car"] == True else ""
 
         # Create a combined pool of characters based on enabled options
-        all_chars = lowercase + uppercase + numbers + specials
+        all_chars = lowercase_pool + uppercase_pool
         password = []
 
         # Ensure minimum numbers and special characters
-        password.extend(random.choices(numbers, k=params["min_numbers"]))
-        password.extend(random.choices(specials, k=params["min_specials_car"]))
+        if numbers_pool:
+            chosen_numbers = random.choices(numbers_pool, k=params["min_numbers"])
+            password.extend(chosen_numbers)
+            #print("Chosen numbers:", chosen_numbers)
 
-        # Fill the remaining length with random characters from the enabled pools
+        if specials_pool:
+            chosen_specials = random.choices(specials_pool, k=params["min_specials_car"])
+            password.extend(chosen_specials)
+            #print("Chosen specials:", chosen_specials)
+
         remaining_length = params["password_length"] - len(password)
+        if remaining_length < 0:
+            print("Error: Minimum character requirements exceed password length.")
+            return None
+
         if remaining_length > 0:
-            password.extend(random.choices(all_chars, k=remaining_length))
+        # Fill the remaining length with random characters from the enabled pools
+            remaining_chars = random.choices(all_chars, k=remaining_length)
+            password.extend(remaining_chars)
+            print("Remaining chars:", remaining_chars)  # Debug line
 
-        # Shuffle the password to ensure randomness
+        #   Shuffle the password to ensure randomness
         random.shuffle(password)
-
-        # Join list into a final password string
-        return ''.join(password)
+        #   Join list into a final password string with no separator between each characters
+        final_password = ''.join(password)
+        #//print("Generated password:", final_password)
+        return final_password
 
     def verify_password(self, params):
     #   Validate all hash parameters at once.

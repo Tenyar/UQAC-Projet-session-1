@@ -1,7 +1,4 @@
-import hashlib
 import argon2
-import sys
-import os
 
 #   Importing usefull constants
 # Importing time cost constants

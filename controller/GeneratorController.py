@@ -2,8 +2,11 @@ import sys
 import os
 
 import view.GeneratorView as generatorView
-from model.GeneratorModel import GeneratorModel
 
+from utility.ConstantsUtility import (
+    DEFAULT_DB_USER_NAME, DEFAULT_DB_PASSWORD_NAME
+)
+from model.GeneratorModel import GeneratorModel
 from model.DAO import DAO
 #####################################################################################
 #          #######      #               ##########
@@ -15,11 +18,12 @@ from model.DAO import DAO
 #####################################################################################
 class GeneratorController:
     def __init__(self, UserMenuController, username):
+        self.username = username
         self.UserMenuController = UserMenuController
         self.running = True
         self.generator_view = generatorView
         self.generateModel = GeneratorModel(username)
-        self.daoConnect = None
+        self.daoConnect = DAO(username)
 
 
     def run(self):
@@ -29,13 +33,23 @@ class GeneratorController:
             print('Your choice:', choice)
             match choice:
                 case 1:
-                    print("Generated password", self.generateModel.generate_password()) # Call the controller of that page
+                     self.create_password()
                 case 2:
                     self.go_back() 
                 case 3:
                     self.exit() 
                 case _:
                     print("\n******************************\nInvalid option. Please try again.\n*******************************")
+
+
+    def create_password(self):
+        #   Create a password for an account or other
+        print("For which service this password is for ?")
+        service_name = input()
+        password_generated = self.generateModel.generate_password()
+        print("Generated password", password_generated)
+        self.daoConnect.connect_db(DEFAULT_DB_USER_NAME)
+        self.daoConnect.create_user_passwords(self.username, service_name, password_generated)
 
 
     def go_back(self):
