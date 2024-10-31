@@ -34,11 +34,11 @@ class DAO:
             return False
         #   Either connect to the user database or the password database
         if(db_type == DEFAULT_DB_USER_NAME):
-            print(f"Connecting to the existing database at {self.db_user_name}.")
+            print(f"Connecting to the existing database at {self.db_user_name}.\n")
             self.connection_user = sqlite3.connect(self.absolute_path_user)
             self.cursor = self.connection_user.cursor()
         elif (db_type == DEFAULT_DB_PASSWORD_NAME):
-            print(f"Connecting to the existing database at {self.db_password_name}.")
+            print(f"Connecting to the existing database at {self.db_password_name}.\n")
             self.connection_pswd = sqlite3.connect(self.absolute_path_password)
             self.cursor = self.connection_pswd.cursor()
 
@@ -55,9 +55,9 @@ class DAO:
             self.connection_user.close()
 
 
-    #//////////////////////////////////////////////////////////////////////////////////////////////////////////
-    #   Creating the databases
-    #//////////////////////////////////////////////////////////////////////////////////////////////////////////
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////
+#   Creating the databases
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////
     def create_db(self):
         #   Create the database in the "database/" folder
         #   Connect to the SQLite database. If it doesn't exist, it will be created.
@@ -125,11 +125,11 @@ class DAO:
         self.connection_user.commit()
 
 
-    #//////////////////////////////////////////////////////////////////////////////////////////////////////////
-    #   Getters
-    #   &
-    #   CRUD methods for databases
-    #//////////////////////////////////////////////////////////////////////////////////////////////////////////
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////
+#   Getters
+#   &
+#   CRUD methods for databases
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////
     #   Method to get the cursor for one of the connection to one of the 2 databases for a user.
     # Cursor = Variable switching between user and password db to provide a way to use sql query.
     def get_db_cursor(self, db_type):
@@ -145,10 +145,11 @@ class DAO:
         if (os.path.exists(username_folder_path)):
             return True
         return False
-    
-    #//////////////////////////////////////////////////////////////////////////////////////////////////////////
-    #   Password database
-    #//////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////
+#   Password database
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////
     #   Prepared request for safety (for sql)
     def get_user_by_username(self, username):
         try:
@@ -283,16 +284,15 @@ class DAO:
         return None
 
 
-    #//////////////////////////////////////////////////////////////////////////////////////////////////////////
-    #   UserData database
-    #//////////////////////////////////////////////////////////////////////////////////////////////////////////
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////
+#   UserData database
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    # TODO: ChestController (affiche les password avec les services)
-    #   get the following data :
-    # service_name 
-    # password 
-    def get_user_service_password(self, username):
-
+# TODO: ChestController (affiche les password avec les services)
+#   get the following data :
+# service_name 
+# password 
+    def get_all_user_service_password(self, username):
         try:
             # Prepared statement to get the user's details
             self.get_db_cursor(DEFAULT_DB_USER_NAME)
@@ -300,11 +300,28 @@ class DAO:
                 SELECT service_name, password FROM UserData WHERE username = ?
             ''', (username,))
             
-            result = self.cursor.fetchone()  # Fetch the result (None if no result) 
+            result = self.cursor.fetchall()  # Fetch the result (None if no result) 
             
-            if result:
-                print(f"\nUser found: {result}\n")
-            else:
+            if not result:
+                print(f"\nUser {username} not found.\n")
+
+        except sqlite3.IntegrityError as e:
+            print(f"Error occurred: {e}")
+
+        return result
+    
+
+    def get_user_service_password(self, username, service):
+        try:
+            # Prepared statement to get the user's details
+            self.get_db_cursor(DEFAULT_DB_USER_NAME)
+            self.cursor.execute('''
+                SELECT service_name, password FROM UserData WHERE username = ? AND service_name = ?
+            ''', (username, service))
+            
+            result = self.cursor.fetchall()  # Fetch the result (None if no result) 
+            
+            if not result:
                 print(f"\nUser {username} not found.\n")
 
         except sqlite3.IntegrityError as e:
@@ -313,9 +330,28 @@ class DAO:
         return result
 
     
-    #//////////////////////////////////////////////////////////////////////////////////////////////////////////
-    #   Setters
-    #//////////////////////////////////////////////////////////////////////////////////////////////////////////
+    def get_all_services(self, username):
+        try:
+            # Prepared statement to get the user's details
+            self.get_db_cursor(DEFAULT_DB_USER_NAME)
+            self.cursor.execute('''
+                SELECT service_name FROM UserData WHERE username = ?
+            ''', (username,))
+            
+            result = self.cursor.fetchall()  # Fetch the result (None if no result) 
+            
+            if not result:
+                print(f"\nUser {username} not found.\n")
+
+        except sqlite3.IntegrityError as e:
+            print(f"Error occurred: {e}")
+
+        return result
+
+
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////
+#   Setters
+#//////////////////////////////////////////////////////////////////////////////////////////////////////////
     def set_username_folder(self, new_username):
         self.username_folder = new_username
 
@@ -350,7 +386,7 @@ class DAO:
             VALUES (?, ?, ?)
         ''', (username, service_name, password))
 
-        self.connection_pswd.commit()
+        self.connection_user.commit()
         print(f"User password for \"{service_name}\" added to the database.")
 
 

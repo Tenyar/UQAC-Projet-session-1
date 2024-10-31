@@ -69,12 +69,12 @@ class GeneratorModel:
         if numbers_pool:
             chosen_numbers = random.choices(numbers_pool, k=params["min_numbers"])
             password.extend(chosen_numbers)
-            #print("Chosen numbers:", chosen_numbers)
+            print("Chosen numbers:", chosen_numbers)
 
         if specials_pool:
             chosen_specials = random.choices(specials_pool, k=params["min_specials_car"])
             password.extend(chosen_specials)
-            #print("Chosen specials:", chosen_specials)
+            print("Chosen specials:", chosen_specials)
 
         remaining_length = params["password_length"] - len(password)
         if remaining_length < 0:
