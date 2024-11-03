@@ -24,6 +24,7 @@ class GeneratorController:
         self.generator_view = generatorView
         self.generateModel = GeneratorModel(username)
         self.daoConnect = DAO(username)
+        self.daoConnect.close()
 
 
     def run(self):

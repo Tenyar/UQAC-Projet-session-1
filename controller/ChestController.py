@@ -13,6 +13,8 @@ class ChestController:
         self.running = True
         self.chest_view = chestView
         self.daoConnect = DAO(username)
+        self.daoConnect.close()
+
 
     def run(self):
         while self.running:
@@ -58,7 +60,6 @@ class ChestController:
             print(f"---> Service: {service}, Password: {password}")
 
         print("\n--------- END ---------\n")
-
 
 
     def go_back(self):

@@ -17,8 +17,8 @@ class DAO:
         #   Path for checking if the file(DB) exist inside the app
         #   Variable that stores the database for a username
         self.username_folder = username
-        self.absolute_path_password = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'database', self.username_folder, self.db_password_name)
         self.absolute_path_user = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'database', self.username_folder, self.db_user_name)
+        self.absolute_path_password = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'database', self.username_folder, self.db_password_name)
         self.connection_pswd = None
         self.connection_user = None
         self.cursor = None
@@ -29,31 +29,33 @@ class DAO:
             #   Connect both databases
             self.connection_pswd = sqlite3.connect(self.absolute_path_password)
             self.connection_user = sqlite3.connect(self.absolute_path_user)
+
+            self.cursor = self.connection_user.cursor()
+            self.cursor = self.connection_pswd.cursor()
+
         except Exception as e:
             print("\n[Exception]!", str(e))
             return False
         #   Either connect to the user database or the password database
-        if(db_type == DEFAULT_DB_USER_NAME):
-            print(f"Connecting to the existing database at {self.db_user_name}.\n")
-            self.connection_user = sqlite3.connect(self.absolute_path_user)
-            self.cursor = self.connection_user.cursor()
-        elif (db_type == DEFAULT_DB_PASSWORD_NAME):
-            print(f"Connecting to the existing database at {self.db_password_name}.\n")
-            self.connection_pswd = sqlite3.connect(self.absolute_path_password)
-            self.cursor = self.connection_pswd.cursor()
+       #if(db_type == DEFAULT_DB_USER_NAME):
+       #    print(f"Connecting to the existing database at {self.db_user_name}.\n")
+       #    self.connection_user = sqlite3.connect(self.absolute_path_user)
+       #    self.cursor = self.connection_user.cursor()
+       #elif (db_type == DEFAULT_DB_PASSWORD_NAME):
+       #    print(f"Connecting to the existing database at {self.db_password_name}.\n")
+       #    self.connection_pswd = sqlite3.connect(self.absolute_path_password)
+       #    self.cursor = self.connection_pswd.cursor()
 
 
     def close(self):
-        #Close the database connection.
-        #if self.connection:
-        #    self.connection.close()
-
+        #   Close the database connection.
         if self.connection_pswd:
+            print("Password database connection closed.")
             self.connection_pswd.close()
-
         if self.connection_user:
+            print("User database connection closed.")
             self.connection_user.close()
-
+        self.cursor = None
 
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////
 #   Creating the databases
@@ -168,7 +170,6 @@ class DAO:
 
         except sqlite3.IntegrityError as e:
             print(f"Error occurred: {e}")
-
         return user
 
 
@@ -191,8 +192,6 @@ class DAO:
                 return None
         except sqlite3.IntegrityError as e:
             print(f"Error occurred: {e}")
-
-        return None
 
 
     def get_hashed_master_password(self, username):
@@ -281,8 +280,6 @@ class DAO:
         except sqlite3.IntegrityError as e:
             print(f"Error occurred: {e}")
 
-        return None
-
 
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////
 #   UserData database
@@ -354,6 +351,11 @@ class DAO:
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////
     def set_username_folder(self, new_username):
         self.username_folder = new_username
+
+
+    def set_absolute_paths(self):
+        self.absolute_path_password = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'database', self.username_folder, self.db_password_name)
+        self.absolute_path_user = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'database', self.username_folder, self.db_user_name)
 
 
     def create_user(self, user):
