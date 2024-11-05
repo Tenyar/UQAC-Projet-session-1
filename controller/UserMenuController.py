@@ -72,6 +72,7 @@ class UserMenuController:
                     print(f"Error while deleting folder: {e}")
             else:
                 print("Folder not found, nothing to delete.")
+        self.disconnect()
 
 
     def disconnect(self):
