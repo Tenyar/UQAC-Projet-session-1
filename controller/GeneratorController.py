@@ -45,8 +45,12 @@ class GeneratorController:
 
     def create_password(self):
         #   Create a password for an account or other
-        print("For which service this password is for ?")
+        print("For which service this password is for?")
         service_name = input()
+        while not service_name:
+            print('[ERROR] Please, enter a name for the service?')
+            service_name = input()
+            
         password_generated = self.generateModel.generate_password()
         print("Generated password", password_generated)
         self.daoConnect.connect_db(DEFAULT_DB_USER_NAME)

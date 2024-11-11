@@ -1,15 +1,27 @@
 #   Utility fonctions for GeneratorController
 #   Involve mainly and only print/input statements
 def get_password_options(params):
-    params["password_length"] = int(input("Enter the password length (8-128): "))
+
+    print('test')
+    params["password_length"] = input("Enter the password length (8-128): ") 
+    if not params["password_length"]:
+        params["password_length"] = 16
     params["lowercase_alphabet"] = get_boolean_input("Include lowercase letters? (y/n): ")
     params["uppercase_alphabet"] = get_boolean_input("Include uppercase letters? (y/n): ")
     params["numbers"] = get_boolean_input("Include numbers? (y/n): ")
     params["specials_car"] = get_boolean_input("Include special characters? (y/n): ")
     #   if one of these options is true
-    params["min_numbers"] = int(input("Minimum number of digits: ")) if params["numbers"] == True else 0
-    params["min_specials_car"] = int(input("Minimum number of special characters: ")) if params["specials_car"] == True else 0
-
+    params["min_numbers"] = input("Minimum number of digits: ")
+    if not params["min_numbers"]:
+        params["min_numbers"] = 4
+    params["min_specials_car"] = input("Minimum number of special characters: ")
+    if not params["min_specials_car"]:
+        params["min_specials_car"] = 4
+    
+    #   Make sure the values are int
+    params["password_length"] = int(params["password_length"])
+    params["min_numbers"] = int(params["min_numbers"])
+    params["min_specials_car"] = int(params["min_specials_car"])
     # Return all the values
     return params
 

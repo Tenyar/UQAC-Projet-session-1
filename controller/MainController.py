@@ -81,6 +81,8 @@ class MainController:
         print("\n--------Connect to your login account--------")
         # Implement logic for connecting to an account here...
         username_input = input("Enter your username/email: ")
+        while not username_input:
+            username_input = input("[ERROR] Please, Enter your username/email: ")
         self.daoConnect = DAO(username_input)
 
         while self.daoConnect.connect_db(DEFAULT_DB_USER_NAME) == False:
