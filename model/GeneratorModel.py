@@ -94,7 +94,7 @@ class GeneratorModel:
         return final_password
 
 
-    def verify_password(self, params):
+    def verify_password(self, params: dict):
     #   Validate all hash parameters at once.
         validated_params = params
         #   Check if no options has been set to true (means that nothing can be created), then put a-z at least to true

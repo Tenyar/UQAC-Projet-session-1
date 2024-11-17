@@ -34,7 +34,7 @@ class HashModel:
         return
 
 
-    def get_user_inputs(user = None):
+    def get_user_inputs():
         #   Prompt user for all hash parameters and return them as a dictionary.
         # ---  means the algorithm takes time to run, making brute-forcing slower.
         time_cost = input("Enter time cost: ")
@@ -55,10 +55,10 @@ class HashModel:
     
 
     @staticmethod
-    def hash_password(password, user=None):
+    def hash_password(password: str, user=None):
         # Ask user personnal choices for hashing parameters
         # Use Argon2 to hash the master password (Argon2id would be better to prevent further breach)
-        hash_params = HashModel.get_user_inputs(user)
+        hash_params = HashModel.get_user_inputs()
         print(hash_params, "\n")
         # Verify if the values are correct for at least a minimum of security
         validated_hash_params = HashModel.validate_hashed_params(hash_params)
@@ -88,7 +88,7 @@ class HashModel:
 
     @staticmethod
     #   hash_data = all elements used during the hashing of the password
-    def verify_password(hash_data, input_password, db_password):
+    def verify_password(hash_data: dict, input_password: str, db_password: str):
         print(hash_data)
         try:
             ph = argon2.PasswordHasher(
@@ -105,7 +105,7 @@ class HashModel:
             return False
     
 
-    def validate_hashed_params(hash_params):
+    def validate_hashed_params(hash_params: dict):
     #   Validate all hash parameters at once.
         validated_params = {}
         

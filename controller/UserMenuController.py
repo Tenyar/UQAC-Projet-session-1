@@ -3,10 +3,8 @@ import os
 import view.UserMenuView as userView
 import utility.functionUtility as functionUtility
 
-# Importing DAO constants
-from utility.ConstantsUtility import (
-    DEFAULT_DB_USER_NAME, DEFAULT_DB_PASSWORD_NAME
-)
+import atexit
+
 from GeneratorController import GeneratorController
 from ChestController import ChestController
 #####################################################################################
@@ -18,7 +16,7 @@ from ChestController import ChestController
 #          #######      ########        ##########
 #####################################################################################
 class UserMenuController:
-    def __init__(self, mainController, username, dao):
+    def __init__(self, mainController, EncryptionManager, username, dao):
         self.username = username
         self.mainController = mainController
         self.running = True

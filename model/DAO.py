@@ -1,12 +1,14 @@
-# https://docs.python.org/3/library/sqlite3.html (lien vers la doc sqlite3 pour python)
+#   https://docs.python.org/3/library/sqlite3.html (lien vers la doc sqlite3 pour python)
 import sqlite3
 import os
 
-# Importing DAO constants
+#   Importing DAO constants
 from utility.ConstantsUtility import (
     DEFAULT_DB_USER_NAME, DEFAULT_DB_PASSWORD_NAME
 )
 from model.HashModel import HashModel
+#   For file encryption
+
 
 class DAO:
     def __init__(self, username):
@@ -17,6 +19,7 @@ class DAO:
         #   Path for checking if the file(DB) exist inside the app
         #   Variable that stores the database for a username
         self.username_folder = username
+        self.path_to_db = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'database', self.username_folder)
         self.absolute_path_user = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'database', self.username_folder, self.db_user_name)
         self.absolute_path_password = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'database', self.username_folder, self.db_password_name)
         self.connection_pswd = None
@@ -86,7 +89,6 @@ class DAO:
             self.create_passwords_tables()
             self.create_user_tables()
 
-
     def create_passwords_tables(self):
         #   Create the necessary tables if they don't exist.
         cursor = self.connection_pswd.cursor()
@@ -134,7 +136,7 @@ class DAO:
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////
     #   Method to get the cursor for one of the connection to one of the 2 databases for a user.
     # Cursor = Variable switching between user and password db to provide a way to use sql query.
-    def get_db_cursor(self, db_type):
+    def get_db_cursor(self, db_type: str):
         if(db_type == DEFAULT_DB_PASSWORD_NAME):
             self.cursor = self.connection_pswd.cursor()
         elif(db_type == DEFAULT_DB_USER_NAME):
@@ -149,11 +151,14 @@ class DAO:
         return False
 
 
+    #   Get the path where the database are
+    def get_path_to_db(self):
+        return self.path_to_db
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////
 #   Password database
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////
     #   Prepared request for safety (for sql)
-    def get_user_by_username(self, username):
+    def get_user_by_username(self, username: str):
         try:
             # Prepared statement to get the user's details
             self.get_db_cursor(DEFAULT_DB_PASSWORD_NAME)
@@ -173,7 +178,7 @@ class DAO:
         return user
 
 
-    def get_fullhashed_master_password(self, username):
+    def get_fullhashed_master_password(self, username: str):
         try:
             #   Query to retrieve master_password from MasterPassword table using username
             self.get_db_cursor(DEFAULT_DB_PASSWORD_NAME)
@@ -194,7 +199,7 @@ class DAO:
             print(f"Error occurred: {e}")
 
 
-    def get_hashed_master_password(self, username):
+    def get_hashed_master_password(self, username: str):
         try:
             # Query to retrieve master_password from MasterPassword table using username
             self.get_db_cursor(DEFAULT_DB_PASSWORD_NAME)
@@ -217,7 +222,7 @@ class DAO:
         return None
     
     
-    def get_salt(self, username):
+    def get_salt(self, username: str):
         try:
             self.get_db_cursor(DEFAULT_DB_PASSWORD_NAME)
             self.cursor.execute('''
@@ -239,7 +244,7 @@ class DAO:
         return None
     
 
-    def get_hashing_data(self, username):
+    def get_hashing_data(self, username: str):
         try:
             self.get_db_cursor(DEFAULT_DB_PASSWORD_NAME)
             self.cursor.execute('''
@@ -289,7 +294,7 @@ class DAO:
 #   get the following data :
 # service_name 
 # password 
-    def get_all_user_service_password(self, username):
+    def get_all_user_service_password(self, username: str):
         try:
             # Prepared statement to get the user's details
             self.get_db_cursor(DEFAULT_DB_USER_NAME)
@@ -308,7 +313,7 @@ class DAO:
         return result
     
 
-    def get_user_service_password(self, username, service):
+    def get_user_service_password(self, username: str, service: str):
         try:
             # Prepared statement to get the user's details
             self.get_db_cursor(DEFAULT_DB_USER_NAME)
@@ -327,7 +332,7 @@ class DAO:
         return result
 
     
-    def get_all_services(self, username):
+    def get_all_services(self, username: str):
         try:
             # Prepared statement to get the user's details
             self.get_db_cursor(DEFAULT_DB_USER_NAME)
@@ -349,7 +354,7 @@ class DAO:
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////
 #   Setters
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////
-    def set_username_folder(self, new_username):
+    def set_username_folder(self, new_username: str):
         self.username_folder = new_username
 
 
@@ -358,7 +363,7 @@ class DAO:
         self.absolute_path_user = os.path.join(os.path.abspath(os.path.dirname(__file__)), 'database', self.username_folder, self.db_user_name)
 
 
-    def create_user(self, user):
+    def create_user(self, user: object):
         try:
             # Insert into MasterPassword (User) table
             # and not 'user.hash_password'
@@ -381,7 +386,7 @@ class DAO:
             print(f"Error occurred: {e}")
 
 
-    def create_user_passwords(self, username, service_name, password):
+    def create_user_passwords(self, username: str, service_name: str, password: str):
         self.get_db_cursor(DEFAULT_DB_USER_NAME)
         self.cursor.execute('''
             INSERT INTO UserData (username, service_name, password) 
@@ -392,7 +397,7 @@ class DAO:
         print(f"User password for \"{service_name}\" added to the database.")
 
 
-    def update_master_password(self, user, new_hashed_password):
+    def update_master_password(self, user: object, new_hashed_password: str):
         #   Need user input to change the Password data
         new_hash = HashModel.hash_password(new_hashed_password, user)
         HashModel.split_password(user.get_all_params(), new_hash)
@@ -415,7 +420,7 @@ class DAO:
             print(f"Error occurred: {e}")
 
 
-    def delete_user(self, user):
+    def delete_user(self, user: object):
         try:
             # Delete from PasswordData first to maintain referential integrity (since it has a foreing key to username)
             # Then delete the user
