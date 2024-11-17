@@ -7,14 +7,7 @@ import atexit
 
 from GeneratorController import GeneratorController
 from ChestController import ChestController
-#####################################################################################
-#          #######      #               ##########
-#        #              #                   #
-#       #               #                   #
-#       #               #                   #           (command line interface)
-#        #              #                   #
-#          #######      ########        ##########
-#####################################################################################
+
 class UserMenuController:
     def __init__(self, mainController, EncryptionManager, username, dao):
         self.username = username

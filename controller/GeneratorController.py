@@ -8,14 +8,7 @@ from utility.ConstantsUtility import (
 )
 from model.GeneratorModel import GeneratorModel
 from model.DAO import DAO
-#####################################################################################
-#          #######      #               ##########
-#        #              #                   #
-#       #               #                   #
-#       #               #                   #           (command line interface)
-#        #              #                   #
-#          #######      ########        ##########
-#####################################################################################
+
 class GeneratorController:
     def __init__(self, UserMenuController, username):
         self.username = username
