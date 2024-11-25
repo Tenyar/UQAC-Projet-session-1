@@ -5,7 +5,7 @@ from customtkinter import CTkImage
 from utility.ViewFunctionsUtility import hide_window
 
 MIN_WINDOW_WIDTH = 520
-MIN_WINDOW_HEGIHT = 495
+MIN_WINDOW_HEIGHT = 500
 
 DEFAULT_PADDING_X = 10
 DEFAULT_PADDING_Y = 10
@@ -44,10 +44,11 @@ class MainWindowTkinter(customtkinter.CTk):
         #   Window size
         self.root.geometry(f"{550}x{500}")
         #   Set minimum size for the window
-        self.root.minsize(MIN_WINDOW_WIDTH, MIN_WINDOW_HEGIHT)
+        self.root.minsize(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
         #   Values stored
         self.values = {}
 
+        # Create UI components
         self.create_window()
 
 
@@ -55,6 +56,7 @@ class MainWindowTkinter(customtkinter.CTk):
         #   Using a tkinter Frame for a background without rounded corners
         self.title_frame = customtkinter.CTkFrame(master=self.get_root(), fg_color="#43d583", border_width=None, corner_radius=0)
         self.title_frame.pack(fill="both", expand=False)  # Takes full width with vertical padding
+      
         #   Title label placed in tkinter frame
         title_label = customtkinter.CTkLabel(
             master=self.title_frame,
@@ -87,7 +89,7 @@ class MainWindowTkinter(customtkinter.CTk):
         #   Row 1: Text paragraph
         try:
             pil_image = Image.open(path_icon_app)   # Open the image with Pillow
-            image_icon_app = CTkImage(pil_image, size=(135, 135))   # Convert to CTkImage
+            image_icon_app = CTkImage(pil_image, size=(130, 130))   # Convert to CTkImage
         except Exception as e:
             print(f"Error loading image: {e}")
             image_icon_app = None
@@ -100,7 +102,6 @@ class MainWindowTkinter(customtkinter.CTk):
         label_with_image.grid(row=1, column=0, sticky="", padx=DEFAULT_PADDING_X, pady=0)
         
         #   Row 2: Text paragraph
-        #   Paragraph
         paragraph_text = (
             "Welcome to the password manager!\n"
             "Here, you will register, manage and secure all of your password in one area.\n"
@@ -115,25 +116,43 @@ class MainWindowTkinter(customtkinter.CTk):
         )
         paragraph_label.grid(row=2, column=0, sticky="", padx=DEFAULT_PADDING_X, pady=(MAIN_PARAGRAPH_PADDING_TOP_Y, DEFAULT_PADDING_Y))
         
-        #   Row 3: Username input
-        self.input_field_1 = customtkinter.CTkEntry(
+        #   Row 3-4: Username input
+        self.label_username_error = customtkinter.CTkLabel(
+            master=input_label_frame,
+            text="",
+            compound="left",
+            font=("Roboto", 12, "bold"),
+            text_color="red",
+            anchor="w"  # Align to the left
+        )
+        self.label_username_error.grid(row=3, column=0, sticky="w", padx=DEFAULT_PADDING_X, pady=0)
+        self.input_field_username = customtkinter.CTkEntry(
             master=input_label_frame, 
             placeholder_text="Username", 
             width=DEFAULT_WIDGET_WIDTH, 
             height=DEFAULT_WIDGET_HEIGHT
             )
-        self.input_field_1.grid(row=3, column=0, sticky="", padx=DEFAULT_PADDING_X, pady=DEFAULT_PADDING_Y)
-        #   Row 4: Master password input
-        self.input_field_2 = customtkinter.CTkEntry(
+        self.input_field_username.grid(row=4, column=0, sticky="", padx=DEFAULT_PADDING_X, pady=0)
+        #   Row 5-6: Master password input
+        self.label_password_error = customtkinter.CTkLabel(
+            master=input_label_frame,
+            text="",
+            compound="left",
+            font=("Roboto", 12, "bold"),
+            text_color="red",
+            anchor="w"  # Align to the left
+        )
+        self.label_password_error.grid(row=5, column=0, sticky="w", padx=DEFAULT_PADDING_X, pady=0)
+        self.input_field_password = customtkinter.CTkEntry(
             master=input_label_frame, 
             placeholder_text="Master password", 
             width=DEFAULT_WIDGET_WIDTH, 
             height=DEFAULT_WIDGET_HEIGHT,
             show="*"
             )
-        self.input_field_2.grid(row=4, column=0, sticky="", padx=DEFAULT_PADDING_X, pady=(DEFAULT_PADDING_Y, 0))
+        self.input_field_password.grid(row=6, column=0, sticky="", padx=DEFAULT_PADDING_X, pady=0)
 
-        #   Row 5: Label with text and image
+        #   Row7: Label with text and image
         path_icon_info = os.path.join(self.base_dir, "../../assets/icon_info.png")
         try:
             pil_image = Image.open(path_icon_info)
@@ -141,7 +160,6 @@ class MainWindowTkinter(customtkinter.CTk):
         except Exception as e:
             print(f"Error loading image: {e}")
             image_icon_info = None
-        #   Add label with image
         label_with_image = customtkinter.CTkLabel(
             master=input_label_frame,
             text="  The master password should be remembered by the user!",
@@ -150,32 +168,33 @@ class MainWindowTkinter(customtkinter.CTk):
             font=("Roboto", 12),
             anchor="w"  # Align to the left
         )
-        label_with_image.grid(row=5, column=0, sticky="w", padx=DEFAULT_PADDING_X, pady=(5, 20))
+        label_with_image.grid(row=7, column=0, sticky="w", padx=DEFAULT_PADDING_X, pady=(5,5))
         
-        #   Define a grid(Frame)
         input_label_frame.grid_columnconfigure(0, weight=1)
 
-        #   Row 6: Buttons / Submit buttons
-        #   Frame for buttons
+        #   Row 8: Buttons / Submit buttons
         self.button_sign_in = customtkinter.CTkButton(
             master=input_label_frame,
             text="Sign in", 
             command=self.sign_in,
-            width=(self.input_field_1.winfo_reqwidth()/3),
+            width=(self.input_field_username.winfo_reqwidth()/3),
             font=("Roboto", BUTTON_FONT_SIZE),
             text_color="black"
         )
-        self.button_sign_in.grid(row=6, column=0, sticky="w", padx=(5, 5), pady=(0, DEFAULT_PADDING_Y))
+        self.button_sign_in.grid(row=8, column=0, sticky="w", padx=(5, 5), pady=(0, DEFAULT_PADDING_Y))
 
         self.button_login = customtkinter.CTkButton(
             master=input_label_frame, 
             text="Login", 
             command=self.login,
-            width=(self.input_field_1.winfo_reqwidth()/3),
+            width=(self.input_field_username.winfo_reqwidth()/3),
             font=("Roboto", BUTTON_FONT_SIZE),
             text_color="black"
         )
-        self.button_login.grid(row=6, column=0, sticky="e", padx=(5, 5), pady=(0, DEFAULT_PADDING_Y))
+        self.button_login.grid(row=8, column=0, sticky="e", padx=(5, 5), pady=(0, DEFAULT_PADDING_Y))
+            #   Bind events to clear the error when the user types
+        self.input_field_username.bind("<KeyRelease>", lambda event: self.clear_error("username_input"))
+        self.input_field_password.bind("<KeyRelease>", lambda event: self.clear_error("master_password_input"))
 
 
     def get_root(self):
@@ -195,8 +214,19 @@ class MainWindowTkinter(customtkinter.CTk):
 
 
     def login(self):
-        self.send_data()
+        #   Retrieve text from the input fields and send it.
+        self.values["username"] = self.input_field_username.get()
+        self.values["master_password"] = self.input_field_password.get()
         self.get_controller().connect_login()
+
+
+    def clear_error(self, widget):
+        if widget == "username_input" and self.input_field_username.cget("border_color") == "red":
+            self.label_username_error.configure(text="")
+            self.input_field_username.configure(border_color="gray35")
+        elif widget == "master_password_input" and self.input_field_password.cget("border_color") == "red":
+            self.label_password_error.configure(text="")
+            self.input_field_password.configure(border_color="gray35")
 
 
     def sign_in(self):
@@ -208,6 +238,15 @@ class MainWindowTkinter(customtkinter.CTk):
         self.root.quit()  # Stops the mainloop
         self.root.destroy()  # Destroys the window and resources
         self.get_controller().set_running(False)
+
+
+    def show_error(self, widget, error_msg):
+        if widget == "username_input":
+            self.label_username_error.configure(text=error_msg)
+            self.input_field_username.configure(border_color="red")
+        else:
+            self.label_password_error.configure(text=error_msg)
+            self.input_field_password.configure(border_color="red")
 
 
 #   ------------ Theme methods ------------------------------
@@ -223,6 +262,7 @@ class MainWindowTkinter(customtkinter.CTk):
         customtkinter.set_appearance_mode(new_appearance_mode)
         self.get_controller().theme_change_all(new_appearance_mode)
 
+
     def update_theme(self, colors):
         # Define colors for buttons based on the theme
         BUTTON_TEXT_COLOR = colors["button_text_color"]
@@ -232,25 +272,3 @@ class MainWindowTkinter(customtkinter.CTk):
         self.title_frame.configure(fg_color=TITLE_FG_COLOR)
         self.button_login.configure(text_color=BUTTON_TEXT_COLOR)
         self.button_sign_in.configure(text_color=BUTTON_TEXT_COLOR)
-
-
-    #   Retrieve text from the input fields and send it.
-    def send_data(self):
-        self.values["username"] = self.input_field_1.get()
-        self.values["master_password"] = self.input_field_2.get()
-
-        # Log the data or send it to a function for further processing
-        print(f"Username: {self.values["username"]}")
-        print(f"Master Password: {self.values["master_password"]}")
-
-        # Example: Sending data to another function 
-        self.process_login(self.values["username"], self.values["master_password"])
-
-
-    #   Process the retrieved data (example: validate or store).
-    def process_login(self, username, master_password):
-        if username and master_password:
-            self.get_controller().create_login()
-        else:
-            #TODO : If username + master_password == None then send [ERROR] output to user using red colors
-            print("Please fill in all fields.")
