@@ -27,7 +27,7 @@ class DAO:
         self.cursor = None
     
 
-    def connect_db(self, db_type):
+    def connect_db(self):
         try:
             #   Connect both databases
             self.connection_pswd = sqlite3.connect(self.absolute_path_password)
@@ -39,15 +39,6 @@ class DAO:
         except Exception as e:
             print("\n[Exception]!", str(e))
             return False
-        #   Either connect to the user database or the password database
-       #if(db_type == DEFAULT_DB_USER_NAME):
-       #    print(f"Connecting to the existing database at {self.db_user_name}.\n")
-       #    self.connection_user = sqlite3.connect(self.absolute_path_user)
-       #    self.cursor = self.connection_user.cursor()
-       #elif (db_type == DEFAULT_DB_PASSWORD_NAME):
-       #    print(f"Connecting to the existing database at {self.db_password_name}.\n")
-       #    self.connection_pswd = sqlite3.connect(self.absolute_path_password)
-       #    self.cursor = self.connection_pswd.cursor()
 
 
     def close(self):
@@ -67,8 +58,6 @@ class DAO:
         #   Create the database in the "database/" folder
         #   Connect to the SQLite database. If it doesn't exist, it will be created.
         if not os.path.exists(self.absolute_path_password) and not os.path.exists(self.absolute_path_user):
-            #//print("\nabsolute path for password db : ", self.absolute_path_password)
-            #//print("\nabsolute path for user db : ", self.absolute_path_user)
             while(self.db_user_name == self.db_password_name):
                 self.db_user_name = input("[ERROR] : the user DB can't have the same name as the 'password.db', please retry : \n")
 
@@ -88,6 +77,7 @@ class DAO:
 
             self.create_passwords_tables()
             self.create_user_tables()
+
 
     def create_passwords_tables(self):
         #   Create the necessary tables if they don't exist.
@@ -127,8 +117,6 @@ class DAO:
             ) 
         ''')    # FOREIGN KEY(username) REFERENCES User(username)
         self.connection_user.commit()
-
-
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////
 #   Getters
 #   &
@@ -199,6 +187,33 @@ class DAO:
             print(f"Error occurred: {e}")
 
 
+    def get_all_hashed_params(self, username: str):
+        try:
+         # Query to retrieve master_password from MasterPassword table using username
+            self.get_db_cursor(DEFAULT_DB_PASSWORD_NAME)
+            self.cursor.execute('''
+                SELECT * FROM PasswordData WHERE username = ?
+            ''', (username,))
+            
+            result = self.cursor.fetchall()
+
+            if result:
+                #master_password = result[0]  # Extract the master_password from the result
+                print(f"split_hashed_password for {username}: {result}\n")
+                #   Transform the tuple into a dictionnary
+                keys = ["username", "algo", "time_cost", "memory_cost", "parallelism", "salt_len", "salt", "hash_len", "hashed_password", "derived_key"]
+                first_row = result[0]
+                result_dict = dict(zip(keys, first_row))
+                return result_dict
+            else:
+                print(f"No split_hashed_password found for username: {username}\n")
+                return None
+        except sqlite3.IntegrityError as e:
+            print(f"Error occurred: {e}")
+
+        return None
+
+
     def get_hashed_master_password(self, username: str):
         try:
             # Query to retrieve master_password from MasterPassword table using username
@@ -221,7 +236,7 @@ class DAO:
 
         return None
     
-    
+
     def get_salt(self, username: str):
         try:
             self.get_db_cursor(DEFAULT_DB_PASSWORD_NAME)
@@ -302,10 +317,10 @@ class DAO:
                 SELECT service_name, password FROM UserData WHERE username = ?
             ''', (username,))
             
-            result = self.cursor.fetchall()  # Fetch the result (None if no result) 
-            
+            result = self.cursor.fetchall()
             if not result:
                 print(f"\nUser {username} not found.\n")
+                return None
 
         except sqlite3.IntegrityError as e:
             print(f"Error occurred: {e}")
@@ -444,25 +459,3 @@ class DAO:
             print(f"User {user.get_username()} deleted from the database.")
         except sqlite3.IntegrityError as e:
             print(f"Error occurred: {e}")
-
-
-
-
-
-
-#  def __init__(self, db_connection):
-#      self.connection = db_connection
-#      #   execute SQL statements and fetch results from SQL queries
-#      self.cur = db_connection.cursor()
-#
-#  #   CRUD methods for databases
-#  def create(self, data):
-#      
-#  #   Prepared request for safety (for sql)
-#  def read(self, data):
-#
-#  def update(self, data):
-#
-#  def delete(self, data):
-#  
-#  #con = sqlite3.connect("PasswordManager.db")

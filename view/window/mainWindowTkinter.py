@@ -2,7 +2,7 @@ import os
 import customtkinter
 from PIL import Image
 from customtkinter import CTkImage
-from utility.ViewFunctionsUtility import hide_window
+
 
 MIN_WINDOW_WIDTH = 520
 MIN_WINDOW_HEIGHT = 500
@@ -220,6 +220,10 @@ class MainWindowTkinter(customtkinter.CTk):
         self.get_controller().connect_login()
 
 
+    def sign_in(self):
+        self.get_controller().start_sign_in()
+    
+
     def clear_error(self, widget):
         if widget == "username_input" and self.input_field_username.cget("border_color") == "red":
             self.label_username_error.configure(text="")
@@ -229,15 +233,13 @@ class MainWindowTkinter(customtkinter.CTk):
             self.input_field_password.configure(border_color="gray35")
 
 
-    def sign_in(self):
-        self.get_controller().start_sign_in()
-    
-
     def on_close(self):
+        print("[DEBUG] on_close called [MainWindow]")
         #   Handle window close event.
         self.root.quit()  # Stops the mainloop
         self.root.destroy()  # Destroys the window and resources
         self.get_controller().set_running(False)
+        self.get_controller().exit_app()
 
 
     def show_error(self, widget, error_msg):
@@ -256,7 +258,7 @@ class MainWindowTkinter(customtkinter.CTk):
         self.appearance_mode_optionemenu.configure(state="disabled")
 
         # Hide the window temporarily (prettier)
-        hide_window(self)
+        self.view_utils.hide_window(self)
 
         # Set the appearance mode globally
         customtkinter.set_appearance_mode(new_appearance_mode)

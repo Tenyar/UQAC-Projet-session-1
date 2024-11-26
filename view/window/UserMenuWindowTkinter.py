@@ -6,14 +6,14 @@ import pyperclip
 from utility import SpinBoxUtility
 from PIL import Image
 from customtkinter import CTkImage
-from utility.ViewFunctionsUtility import hide_window
+from utility.ViewFunctionsUtility import ViewFunctionsUtility
 
 from utility.ConstantsUtility import (
     DEFAULT_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH
 )
 
 MIN_WINDOW_WIDTH = 520
-MIN_WINDOW_HEIGHT = 600
+MIN_WINDOW_HEIGHT = 630
 
 DEFAULT_PADDING_X = 10
 DEFAULT_PADDING_Y = 10
@@ -41,6 +41,7 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         super().__init__()
         self.base_dir = os.path.dirname(__file__)
         self.controller = controller
+        self.utility_window = ViewFunctionsUtility(controller)
 
         self.title("Password Manager [PROTOTYPE]")  # Set title for the main window
 
@@ -49,7 +50,7 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         customtkinter.set_default_color_theme('green')
 
         # Set window size and behavior
-        self.geometry(f"{550}x{600}")
+        self.geometry(f"{525}x{630}")
         self.minsize(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
         self.protocol("WM_DELETE_WINDOW", self.on_close)
 
@@ -63,9 +64,16 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         main_frame.grid_rowconfigure(0, weight=1)  # Center vertically
         main_frame.grid_columnconfigure(0, weight=1)  # Center horizontally
 
+        title_label = customtkinter.CTkLabel(
+            master=main_frame,
+            text=f"{self.controller.get_username()} menu",
+            font=("Roboto", TITLE_FONT_SIZE)
+        )
+        title_label.pack(pady=10)  # Spacing around text
+
         #   Create a frame for input fields and labels
         sub_frame = customtkinter.CTkFrame(master=main_frame)
-        sub_frame.pack(pady=DEFAULT_PADDING_Y, padx=DEFAULT_PADDING_X, expand=True)
+        sub_frame.pack(pady=DEFAULT_PADDING_Y, padx=DEFAULT_PADDING_X, expand=False)
 
         # Add a button at the top of the tab view
         self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(
@@ -97,7 +105,7 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         self.tabview._segmented_button.configure(
             font=("Roboto", 16, "bold"),  # Increase font size
             height=50,                   # Increase button height
-            corner_radius=10,            # Adjust corner radius
+            corner_radius=10            # Adjust corner radius
         )
 
         # Add and configure tabs
@@ -112,7 +120,6 @@ class UserMenuWindowTkinter(customtkinter.CTk):
 
 
     def setup_password_generator_tab(self):
-        #   Set up the PasswordGenerator tab
         tab = self.tabview.tab("PasswordGenerator")
         tab.grid_columnconfigure(0, weight=1)
 
@@ -129,8 +136,7 @@ class UserMenuWindowTkinter(customtkinter.CTk):
             master=tab, 
             placeholder_text="service name", 
             width=DEFAULT_WIDGET_WIDTH, 
-            height=DEFAULT_WIDGET_HEIGHT,
-            show="*"
+            height=DEFAULT_WIDGET_HEIGHT
             )
         self.input_service_name.grid(row=1, column=0, sticky="", padx=DEFAULT_PADDING_X, pady=0)
 
@@ -142,37 +148,35 @@ class UserMenuWindowTkinter(customtkinter.CTk):
             height=DEFAULT_WIDGET_HEIGHT,
             state="readonly"
             )
-        self.show_generated_password.grid(row=2, column=0, sticky="ew", padx=40, pady=(DEFAULT_PADDING_Y, 0))
+        self.show_generated_password.grid(row=2, column=0, sticky="ew", padx=40, pady=(5, 0))
         self.show_generated_password.insert(0, "Your generated password")
         
-        path_icon_refresh = os.path.join(self.base_dir, "../../assets/icon_refresh.png")
-        try:
-            pil_image = Image.open(path_icon_refresh)
-            image_icon_refresh = CTkImage(pil_image, size=(25, 25))
-        except Exception as e:
-            print(f"Error loading image: {e}")
-            image_icon_refresh = None
+      # path_icon_refresh = os.path.join(self.base_dir, "../../assets/icon_refresh.png")
+      # try:
+      #     pil_image = Image.open(path_icon_refresh)
+      #     image_icon_refresh = CTkImage(pil_image, size=(25, 25))
+      # except Exception as e:
+      #     print(f"Error loading image: {e}")
+      #     image_icon_refresh = None
         self.button_refresh_password = customtkinter.CTkButton(
             master=tab,
             text="",
             width=BUTTON_DEFAULT_WIDTH,
-            image=image_icon_refresh,
             cursor="hand2"
         )
         self.button_refresh_password.grid(row=3, column=0, sticky="e", padx=(0, 40), pady=(2, 0))
 
-        path_icon_clipboard = os.path.join(self.base_dir, "../../assets/icon_clipboard.png")
-        try:
-            pil_image = Image.open(path_icon_clipboard)
-            image_icon_clipboard = CTkImage(pil_image, size=(25, 25))
-        except Exception as e:
-            print(f"Error loading image: {e}")
-            image_icon_clipboard = None
+      # path_icon_clipboard = os.path.join(self.base_dir, "../../assets/icon_clipboard.png")
+      # try:
+      #     pil_image = Image.open(path_icon_clipboard)
+      #     image_icon_clipboard = CTkImage(pil_image, size=(25, 25))
+      # except Exception as e:
+      #     print(f"Error loading image: {e}")
+      #     image_icon_clipboard = None
         self.button_copy_clipboard = customtkinter.CTkButton(
             master=tab,
             text="",
             width=BUTTON_DEFAULT_WIDTH,
-            image=image_icon_clipboard,
             cursor="hand2",
             command=self.copy_to_clipboard
         )
@@ -307,22 +311,33 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         self.button_submit = customtkinter.CTkButton(
             master=tab, 
             text="Submit", 
-            width=50,
+            width=100,
             font=("Roboto", BUTTON_FONT_SIZE),
             text_color="black",
             cursor="hand2"
         )
-        self.button_submit.grid(row=11, column=0, sticky="", padx=(5, 5), pady=DEFAULT_PADDING_Y)
+        self.button_submit.grid(row=11, column=0, sticky="", padx=(5, 5), pady=(DEFAULT_PADDING_Y, 0))
         
 
     def setup_user_menu_tab(self):
-        """Set up the UserMenu tab"""
         tab = self.tabview.tab("UserMenu")
         tab.grid_columnconfigure(0, weight=1)
 
         # Add a label for user options
-        user_label = customtkinter.CTkLabel(tab, text="User Options:")
+        user_label = customtkinter.CTkLabel(tab, text="User Options:", font=("Roboto", 18, "bold"))
         user_label.grid(row=0, column=0, pady=10, padx=10, sticky="n")
+
+        self.button_delete_account = customtkinter.CTkButton(
+            master=tab,
+            text="Suppress account", 
+            width=BUTTON_DEFAULT_WIDTH,
+            fg_color="#c25364",
+            hover_color="#9f4250",
+            font=("Roboto", BUTTON_FONT_SIZE),
+            text_color="black",
+            cursor="hand2"
+        )
+        self.button_delete_account.grid(row=1, column=0, sticky="e", padx=(0, DEFAULT_PADDING_Y), pady=(DEFAULT_PADDING_Y, 0))
 
 
     def setup_chest_tab(self):
@@ -359,6 +374,11 @@ class UserMenuWindowTkinter(customtkinter.CTk):
             print("Password copied to clipboard!")
 
 
+    def on_close(self):
+        print("[DEBUG] on_close called [UserMenuWindow]")
+        self.utility_window.open_ask_password_window()
+
+
     def clear_error(self, widget):
         if widget == "username_input" and self.input_field_username.cget("border_color") == "red":
             self.label_username_error.configure(text="")
@@ -366,13 +386,6 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         elif widget == "master_password_input" and self.input_field_password.cget("border_color") == "red":
             self.label_password_error.configure(text="")
             self.input_field_password.configure(border_color="gray35")
-
-
-    def on_close(self):
-        #   Handle window close event.
-        self.quit()  # Stops the mainloop
-        self.destroy()  # Destroys the window and resources
-        self.get_controller().set_running(False)
 
 
     def show_error(self, widget, error_msg):
@@ -411,8 +424,3 @@ class UserMenuWindowTkinter(customtkinter.CTk):
 
     def update_slider_label(self, value, label_name, label_widget):
         label_widget.configure(text=f"{label_name} {int(float(value))}")
-
-# Run the application
-if __name__ == "__main__":
-    app = UserMenuWindowTkinter("tst")
-    app.mainloop()

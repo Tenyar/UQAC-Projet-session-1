@@ -126,7 +126,7 @@ class GeneratorModel:
 
 
         #   adjust the password if there's more numbers and specials characters than the password length
-        # TODO : Additionner les valeurs et mitigué ensuite
+        # ? Additionner les valeurs et mitigué ensuite
         added_options_numbers = validated_params["min_numbers"] + validated_params["min_specials_car"]
         if added_options_numbers > validated_params["password_length"]:
             scale_factor  = (validated_params["password_length"] / added_options_numbers)
@@ -138,7 +138,7 @@ class GeneratorModel:
             round_sum_params = rounded_value_1 + rounded_value_2
             print("should be max_length : ", round_sum_params)
 
-            #   More security if one numbers if off by one
+            #   More error gandling if one numbers is off by one
             if round_sum_params < validated_params["password_length"]:
                 #   Add 1 to the value with the higher decimal component
                 if (validated_params["min_numbers"] - rounded_value_1) > (validated_params["min_specials_car"] - rounded_value_2):
@@ -151,7 +151,6 @@ class GeneratorModel:
                     rounded_value_1 -= 1
                 else:
                     rounded_value_2 -= 1
-
 
             validated_params["min_numbers"] = rounded_value_1
             validated_params["min_specials_car"] = rounded_value_2

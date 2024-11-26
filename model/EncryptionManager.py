@@ -1,13 +1,10 @@
 from model.EncryptionModel import EncryptionModel
+from utility.ViewFunctionsUtility import ViewFunctionsUtility
 
 class EncryptionManager:
     def __init__(self):
         self.db_paths = []
-        self.master_password = None
-
-
-    def set_master_password(self, password):
-        self.master_password = password
+        #self.master_password = None
 
 
     def add_db_path(self, db_path):
@@ -15,10 +12,13 @@ class EncryptionManager:
             self.db_paths.append(db_path)
 
 
-    def encrypt_on_exit(self):
-        if self.master_password:
+    def encrypt_on_exit(self, password):
+        # Retrieve the entered password
+        if password:
             print('\n\n[EXIT] Encrypting your database(s)!\n')
             for db_path in self.db_paths:
-                encrypted_path = db_path # + ".enc"
-                EncryptionModel.encrypt_db(db_path, self.master_password, encrypted_path)
+                encrypted_path = db_path
+                EncryptionModel.encrypt_db(db_path, password, encrypted_path)
+            return True
             #    print(f"Encrypted {db_path} to {encrypted_path}")
+        return False

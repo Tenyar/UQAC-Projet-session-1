@@ -26,6 +26,7 @@ from utility.ConstantsUtility import (
     DEFAULT_SALT_LEN, MIN_SALT_LEN, MAX_SALT_LEN
 )
 
+
 #   Utility class for hashing functions
 class HashModel:
     def __init__(self,):
@@ -34,36 +35,13 @@ class HashModel:
         return
 
 
-    def get_user_inputs():
-        #   Prompt user for all hash parameters and return them as a dictionary.
-        # ---  means the algorithm takes time to run, making brute-forcing slower.
-        time_cost = input("Enter time cost: ")
-        # ---  ensures that an attacker would need significant memory to compute the hash.
-        memory_cost = input("Enter memory cost (in KiB): ")
-        # ---  allows for efficient use of CPU cores for legitimate users, but an attacker would need a lot of CPU power to brute-force.
-        parallelism = input("Enter parallelism of the hash: ")
-        hash_len = input("Enter hash length: ")
-        salt_len = input("Enter salt length: ")
-
-        return {
-            "time_cost": time_cost,
-            "memory_cost": memory_cost,
-            "parallelism": parallelism,
-            "hash_len": hash_len,
-            "salt_len": salt_len,
-        }
-    
-
     @staticmethod
-    def hash_password(password: str, user=None):
-        # Ask user personnal choices for hashing parameters
-        # Use Argon2 to hash the master password (Argon2id would be better to prevent further breach)
-        hash_params = HashModel.get_user_inputs()
-        print(hash_params, "\n")
-        # Verify if the values are correct for at least a minimum of security
+    def hash_password(password: str, hash_params, user=None):
+        #   Use Argon2 to hash the master password (Argon2id would be better to prevent further breach)
+        #   Verify if the values are correct for at least a minimum of security
         validated_hash_params = HashModel.validate_hashed_params(hash_params)
 
-        # Store data about hashing
+        #   Store data about hashing
         if user:
             user.hash_params["time_cost"] = validated_hash_params["time_cost"]
             user.hash_params["memory_cost"] = validated_hash_params["memory_cost"]
@@ -75,7 +53,7 @@ class HashModel:
             print(f"VALIDATING PARAMS FOR {x} :", {y})
         print("\n")
             
-        # Use Argon2 to hash the master password with validated parameters
+        #   Use Argon2 to hash the master password with validated parameters
         ph = argon2.PasswordHasher(
             time_cost=validated_hash_params["time_cost"],
             memory_cost=validated_hash_params["memory_cost"],
@@ -111,32 +89,32 @@ class HashModel:
         
         # Ensure time cost is within the range of minimum and maximum limits
         validated_params["time_cost"] = max(
-            min(int(hash_params["time_cost"]) if hash_params["time_cost"] else DEFAULT_TIME_COST, MAX_TIME_COST), MIN_TIME_COST
+            min(int(hash_params["time_cost"]) if int(hash_params["time_cost"]) else DEFAULT_TIME_COST, MAX_TIME_COST), MIN_TIME_COST
         )
 
         # Ensure memory cost is within the range of minimum and maximum limits
         validated_params["memory_cost"] = max(
-            min(int(hash_params["memory_cost"]) if hash_params["memory_cost"] else DEFAULT_MEMORY_COST, MAX_MEMORY_COST), MIN_MEMORY_COST
+            min(int(hash_params["memory_cost"]) if int(hash_params["memory_cost"]) else DEFAULT_MEMORY_COST, MAX_MEMORY_COST), MIN_MEMORY_COST
         )
 
         # Ensure parallelism is within the range of minimum and maximum limits
         validated_params["parallelism"] = max(
-            min(int(hash_params["parallelism"]) if hash_params["parallelism"] else DEFAULT_PARALLELISM, MAX_PARALLELISM), MIN_PARALLELISM
+            min(int(hash_params["parallelism"]) if int(hash_params["parallelism"]) else DEFAULT_PARALLELISM, MAX_PARALLELISM), MIN_PARALLELISM
         )
 
         # Ensure hash length is within the range of minimum and maximum limits
         validated_params["hash_len"] = max(
-            min(int(hash_params["hash_len"]) if hash_params["hash_len"] else DEFAULT_HASH_LEN, MAX_HASH_LEN), MIN_HASH_LEN
+            min(int(hash_params["hash_len"]) if int(hash_params["hash_len"]) else DEFAULT_HASH_LEN, MAX_HASH_LEN), MIN_HASH_LEN
         )
 
         # Ensure salt length is within the range of minimum and maximum limits
         validated_params["salt_len"] = max(
-            min(int(hash_params["salt_len"]) if hash_params["salt_len"] else DEFAULT_SALT_LEN, MAX_SALT_LEN), MIN_SALT_LEN
+            min(int(hash_params["salt_len"]) if int(hash_params["salt_len"]) else DEFAULT_SALT_LEN, MAX_SALT_LEN), MIN_SALT_LEN
         )
         
         return validated_params
     
-
+    @staticmethod
     # ? Peut on mettre cette méthode en static pour être utilitaire à d'autre mdp comme ceux des sites ? (évite d'en avoir deux)
     def split_password(hash_params, full_hashed_value):
         print("entering split Password : ", full_hashed_value)

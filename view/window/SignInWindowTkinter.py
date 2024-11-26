@@ -1,6 +1,6 @@
 import os
 import customtkinter
-from utility.ViewFunctionsUtility import hide_window
+from utility.ViewFunctionsUtility import ViewFunctionsUtility
 
 MIN_WINDOW_WIDTH = 775
 MIN_WINDOW_HEIGHT = 375
@@ -23,23 +23,23 @@ BUTTON_FONT_SIZE = 18
 BUTTON_PADDING_Y=25
 #   ----    Utility constants
 from utility.ConstantsUtility import (
-    DEFAULT_TIME_COST, MIN_TIME_COST, MAX_TIME_COST
+    MIN_TIME_COST, MAX_TIME_COST
 )
 
 from utility.ConstantsUtility import (
-    DEFAULT_MEMORY_COST, MIN_MEMORY_COST, MAX_MEMORY_COST
+    MIN_MEMORY_COST, MAX_MEMORY_COST
 )
 
 from utility.ConstantsUtility import (
-    DEFAULT_PARALLELISM, MIN_PARALLELISM, MAX_PARALLELISM
+    MIN_PARALLELISM, MAX_PARALLELISM
 )
 
 from utility.ConstantsUtility import (
-    DEFAULT_HASH_LEN, MIN_HASH_LEN, MAX_HASH_LEN
+    MIN_HASH_LEN, MAX_HASH_LEN
 )
 
 from utility.ConstantsUtility import (
-    DEFAULT_SALT_LEN, MIN_SALT_LEN, MAX_SALT_LEN
+    MIN_SALT_LEN, MAX_SALT_LEN
 )
 
 
@@ -47,6 +47,7 @@ class SignInWindowTkinter(customtkinter.CTk):
     def __init__(self, controller):
         super().__init__()
         self.base_dir = os.path.dirname(__file__)
+        self.view_utils = ViewFunctionsUtility()
         self.controller = controller
         self.root = customtkinter.CTkToplevel()
         self.root.title("Sign in [PROTOTYPE]")
@@ -414,7 +415,7 @@ class SignInWindowTkinter(customtkinter.CTk):
 
 #   ------------ Theme method ------------------------------
     def update_theme(self, colors):
-        hide_window(self)
+        self.view_utils.hide_window(self)
 
         BUTTON_TEXT_COLOR = colors["button_text_color"]
         TITLE_FG_COLOR = colors["title_fg_color"]
