@@ -2,7 +2,7 @@ import os
 import customtkinter
 from PIL import Image
 from customtkinter import CTkImage
-
+from utility.ViewFunctionsUtility import ViewFunctionsUtility
 
 MIN_WINDOW_WIDTH = 520
 MIN_WINDOW_HEIGHT = 500
@@ -32,13 +32,14 @@ class MainWindowTkinter(customtkinter.CTk):
         super().__init__()
         self.base_dir = os.path.dirname(__file__)
         self.controller = controller
-        self.root = customtkinter.CTkToplevel()
-        self.root.title("Password Manager [PROTOTYPE]")
+        self.view_utils = ViewFunctionsUtility(self)
 
         #   Default system theme
         customtkinter.set_appearance_mode('System')
         customtkinter.set_default_color_theme('green')
 
+        self.root = customtkinter.CTkToplevel()
+        self.root.title("Password Manager [PROTOTYPE]")
         #   Set up window closing behavior
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
         #   Window size

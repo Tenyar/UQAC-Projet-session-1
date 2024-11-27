@@ -1,9 +1,12 @@
 import shutil
 import os
 import view.window.UserMenuWindowTkinter as user_menu_window
-from utility.functionUtility import is_field_not_empty
+from GeneratorController import GeneratorController
+from ChestController import ChestController
 from model.HashModel import HashModel
+from model.GeneratorModel import GeneratorModel
 from utility.ViewFunctionsUtility import ViewFunctionsUtility
+from utility.functionUtility import is_field_not_empty
 
 
 class UserMenuController:
@@ -11,8 +14,10 @@ class UserMenuController:
         self.username = username
         self.encryption_manager = EncryptionManager
         self.mainController = mainController
+        self.generator_controller = GeneratorController(self, self.username)
         self.running = True
         self.daoConnect = dao
+        self.daoConnect.close()
         self.view_utils = ViewFunctionsUtility(self)
 
         self.open_windows = {}
@@ -46,6 +51,24 @@ class UserMenuController:
             #   Call the utility function to display the menu
             self.set_window("user_menu_window", user_menu_window.UserMenuWindowTkinter(self))
             self.get_window("user_menu_window").get_root().mainloop()
+
+
+    def generate_password(self, gen_values):
+        service_name = self.get_window("user_menu_window").get_value("service_name")
+        if not is_field_not_empty(service_name):
+            self.get_window("user_menu_window").show_error("service_name_input", "You need to enter a service name!")
+            return
+
+        generated_password = self.generator_controller.create_password(service_name, gen_values)
+        #   Temporarily make the Entry writable
+        self.get_window("user_menu_window").get_password_widget().configure(state="normal")
+
+        #   Insert the generated password
+        self.get_window("user_menu_window").get_password_widget().delete(0, "end")  # Clear existing text
+        self.get_window("user_menu_window").get_password_widget().insert(0, generated_password)
+
+        #   Make it read-only again
+        self.get_window("user_menu_window").get_password_widget().configure(state="readonly")
 
 
     def delete_account(self):
@@ -82,17 +105,16 @@ class UserMenuController:
 
 
     def disconnect(self, window, password):
-        #   Wait for the password window to close
-        window.destroy()
+        #//window.destroy()
         if is_field_not_empty(password):
             #   master password & verify it's authenticity and is veracity
             self.daoConnect.connect_db()
             master_password_db = self.daoConnect.get_fullhashed_master_password(self.username)
             data_hash_db = self.daoConnect.get_hashing_data(self.username)
             if HashModel.verify_password(data_hash_db, password, master_password_db):
+                window.destroy()
+                self.get_window("user_menu_window").get_root().destroy()
                 self.mainController.get_encryption_manager().encrypt_on_exit(password)
-                self.get_window("user_menu_window").quit()
-                self.get_window("user_menu_window").destroy()
                 self.running = False
                 self.mainController.set_running(True)
                 self.mainController.run()

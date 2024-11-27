@@ -47,10 +47,10 @@ class SignInWindowTkinter(customtkinter.CTk):
     def __init__(self, controller):
         super().__init__()
         self.base_dir = os.path.dirname(__file__)
-        self.view_utils = ViewFunctionsUtility()
         self.controller = controller
         self.root = customtkinter.CTkToplevel()
         self.root.title("Sign in [PROTOTYPE]")
+        self.view_utils = ViewFunctionsUtility(self)
 
         # //  Ensure the window is on top and grabs focus
        # //self.root.attributes("-topmost", False)
@@ -415,6 +415,7 @@ class SignInWindowTkinter(customtkinter.CTk):
 
 #   ------------ Theme method ------------------------------
     def update_theme(self, colors):
+        # Hide the window temporarily (prettier)
         self.view_utils.hide_window(self)
 
         BUTTON_TEXT_COLOR = colors["button_text_color"]

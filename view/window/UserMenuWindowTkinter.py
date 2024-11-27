@@ -3,11 +3,11 @@ import os
 sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 import customtkinter
 import pyperclip
-from utility import SpinBoxUtility
 from PIL import Image
 from customtkinter import CTkImage
 from utility.ViewFunctionsUtility import ViewFunctionsUtility
-
+from utility import SpinBoxUtility
+from utility.ViewFunctionsUtility import ViewFunctionsUtility
 from utility.ConstantsUtility import (
     DEFAULT_PASSWORD_LENGTH, MAX_PASSWORD_LENGTH, MIN_PASSWORD_LENGTH
 )
@@ -41,20 +41,20 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         super().__init__()
         self.base_dir = os.path.dirname(__file__)
         self.controller = controller
-        self.utility_window = ViewFunctionsUtility(controller)
+        self.view_utils = ViewFunctionsUtility(controller)
 
-        self.title("Password Manager [PROTOTYPE]")  # Set title for the main window
+        self.root = customtkinter.CTkToplevel()
+        self.root.protocol("WM_DELETE_WINDOW", self.on_close)
+        self.root.title("Password Manager [PROTOTYPE]")  # Set title for the main window
 
-        # Default system theme
         customtkinter.set_appearance_mode('System')
         customtkinter.set_default_color_theme('green')
 
-        # Set window size and behavior
         self.geometry(f"{525}x{630}")
         self.minsize(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
-        self.protocol("WM_DELETE_WINDOW", self.on_close)
 
-        # Create TabView and other UI components
+        self.values = {}
+
         self.create_window()
 
 
@@ -151,36 +151,53 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         self.show_generated_password.grid(row=2, column=0, sticky="ew", padx=40, pady=(5, 0))
         self.show_generated_password.insert(0, "Your generated password")
         
-      # path_icon_refresh = os.path.join(self.base_dir, "../../assets/icon_refresh.png")
-      # try:
-      #     pil_image = Image.open(path_icon_refresh)
-      #     image_icon_refresh = CTkImage(pil_image, size=(25, 25))
-      # except Exception as e:
-      #     print(f"Error loading image: {e}")
-      #     image_icon_refresh = None
-        self.button_refresh_password = customtkinter.CTkButton(
-            master=tab,
-            text="",
-            width=BUTTON_DEFAULT_WIDTH,
-            cursor="hand2"
-        )
-        self.button_refresh_password.grid(row=3, column=0, sticky="e", padx=(0, 40), pady=(2, 0))
+         # Verify paths
+        path_icon_refresh = os.path.abspath(os.path.join(self.base_dir, "../../assets/icon_refresh.png"))
+        path_icon_clipboard = os.path.abspath(os.path.join(self.base_dir, "../../assets/icon_clipboard.png"))
+       
+        try:
+            pil_image_refresh = Image.open(path_icon_refresh)
+            image_icon_refresh = CTkImage(pil_image_refresh, size=(25, 25))
+            self.button_refresh_password = customtkinter.CTkButton(
+                master=tab,
+                text="",
+                width=BUTTON_DEFAULT_WIDTH,
+                image=image_icon_refresh,
+                cursor="hand2"
+            )
+            self.button_refresh_password.grid(row=3, column=0, sticky="e", padx=(0, 40), pady=(2, 0))
+        except Exception as e:
+            print(f"Error loading image: {e}")
+            self.button_refresh_password = customtkinter.CTkButton(
+                master=tab,
+                text="refresh",
+                width=BUTTON_DEFAULT_WIDTH,
+                cursor="hand2"
+            )
+            self.button_refresh_password.grid(row=3, column=0, sticky="e", padx=(0, 40), pady=(2, 0))
 
-      # path_icon_clipboard = os.path.join(self.base_dir, "../../assets/icon_clipboard.png")
-      # try:
-      #     pil_image = Image.open(path_icon_clipboard)
-      #     image_icon_clipboard = CTkImage(pil_image, size=(25, 25))
-      # except Exception as e:
-      #     print(f"Error loading image: {e}")
-      #     image_icon_clipboard = None
-        self.button_copy_clipboard = customtkinter.CTkButton(
-            master=tab,
-            text="",
-            width=BUTTON_DEFAULT_WIDTH,
-            cursor="hand2",
-            command=self.copy_to_clipboard
-        )
-        self.button_copy_clipboard.grid(row=3, column=0, sticky="e", padx=(0, 85), pady=(2, 0))
+        try:
+            pil_image_clipboard = Image.open(path_icon_clipboard)
+            image_icon_clipboard = CTkImage(pil_image_clipboard, size=(25, 25))
+            self.button_copy_clipboard = customtkinter.CTkButton(
+                master=tab,
+                text="",
+                width=BUTTON_DEFAULT_WIDTH,
+                cursor="hand2",
+                image=image_icon_clipboard,
+                command=self.copy_to_clipboard
+            )
+            self.button_copy_clipboard.grid(row=3, column=0, sticky="e", padx=(0, 85), pady=(2, 0))
+        except Exception as e:
+            print(f"Error loading image: {e}")
+            self.button_copy_clipboard = customtkinter.CTkButton(
+                master=tab,
+                text="copy",
+                width=BUTTON_DEFAULT_WIDTH,
+                cursor="hand2",
+                command=self.copy_to_clipboard
+            )
+            self.button_copy_clipboard.grid(row=3, column=0, sticky="e", padx=(0, 95), pady=(2, 0))
 
         password_params_frame = customtkinter.CTkFrame(master=tab, fg_color="#E0D0F0", border_width=1, border_color="#691ABC")
         password_params_frame.grid(row=4, column=0, padx=40, pady=3, sticky="we")
@@ -308,16 +325,31 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         )
         label_minimum_special_chars.grid(row=0, column=0, sticky="w", padx=DEFAULT_PADDING_X, pady=3)
 
+        self.button_init = customtkinter.CTkButton(
+            master=tab, 
+            text="Generate", 
+            width=100,
+            font=("Roboto", BUTTON_FONT_SIZE),
+            text_color="black",
+            command=self.submit_generate_password,
+            cursor="hand2"
+        )
+        self.button_init.grid(row=11, column=0, sticky="", padx=(5, 150), pady=(DEFAULT_PADDING_Y, 0))
         self.button_submit = customtkinter.CTkButton(
             master=tab, 
             text="Submit", 
             width=100,
             font=("Roboto", BUTTON_FONT_SIZE),
             text_color="black",
+            command=self.submit_generate_password,
             cursor="hand2"
         )
-        self.button_submit.grid(row=11, column=0, sticky="", padx=(5, 5), pady=(DEFAULT_PADDING_Y, 0))
-        
+        self.button_submit.grid(row=11, column=0, sticky="", padx=(150, 5), pady=(DEFAULT_PADDING_Y, 0))
+
+
+    def submit_generate_password(self):
+        self.get_controller().generate_password(self.get_password_values())
+
 
     def setup_user_menu_tab(self):
         tab = self.tabview.tab("UserMenu")
@@ -351,11 +383,29 @@ class UserMenuWindowTkinter(customtkinter.CTk):
 
 
     def get_root(self):
-        return self
+        return self.root
 
 
     def get_value(self, widget):
         return self.values[widget]
+
+
+    def get_password_values(self):
+        gen_values = {}
+        gen_values["service_name"] = self.input_service_name.get()
+        gen_values["generated_password"] = self.show_generated_password.get()
+        gen_values["password_length"] = self.slider_password_length.get()
+        gen_values["lowercase_alphabet"] = self.alphabet_lowercase_switch.get()
+        gen_values["upppercase_alphabet"] = self.alphabet_uppercase_switch.get()
+        gen_values["numbers"] = self.numbers_switch.get()
+        gen_values["special_chars"] = self.special_chars_switch.get()
+        gen_values["min_numbers"] = self.minimum_numbers_spinbox.get()
+        gen_values["min_special_chars"] = self.minimum_special_chars_spinbox.get()
+        return gen_values
+
+
+    def get_password_widget(self):
+        return self.show_generated_password
 
 
     def get_controller(self):
@@ -376,26 +426,23 @@ class UserMenuWindowTkinter(customtkinter.CTk):
 
     def on_close(self):
         print("[DEBUG] on_close called [UserMenuWindow]")
-        self.utility_window.open_ask_password_window()
+        self.view_utils.open_ask_password_window(self.get_root())
+        self.get_controller().set_running(False)
 
 
     def clear_error(self, widget):
-        if widget == "username_input" and self.input_field_username.cget("border_color") == "red":
-            self.label_username_error.configure(text="")
-            self.input_field_username.configure(border_color="gray35")
+        if widget == "service_name_input" and self.input_field_username.cget("border_color") == "red":
+            self.label_service_name_error.configure(text="")
+            self.input_service_name.configure(border_color="gray35")
         elif widget == "master_password_input" and self.input_field_password.cget("border_color") == "red":
             self.label_password_error.configure(text="")
             self.input_field_password.configure(border_color="gray35")
 
 
     def show_error(self, widget, error_msg):
-        if widget == "username_input":
-            self.label_username_error.configure(text=error_msg)
-            self.input_field_username.configure(border_color="red")
-        else:
-            self.label_password_error.configure(text=error_msg)
-            self.input_field_password.configure(border_color="red")
-
+        if widget == "service_name_input":
+            self.label_service_name_error.configure(text=error_msg)
+            self.input_service_name.configure(border_color="red")
 
 #   ------------ Theme methods ------------------------------
 #   Change button colors dynamically based on the theme.
@@ -404,7 +451,7 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         self.appearance_mode_optionemenu.configure(state="disabled")
 
         # Hide the window temporarily (prettier)
-        hide_window(self)
+        self.view_utils.hide_window(self)
 
         # Set the appearance mode globally
         customtkinter.set_appearance_mode(new_appearance_mode)
