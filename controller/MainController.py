@@ -32,7 +32,7 @@ class MainController:
         self.daoConnect = None
         self.user_master_password = None
         self.view_utils = ViewFunctionsUtility(self)
-
+        self.user_menu_controller = None
         self.open_windows = {}
         self.current_window_theme = "Light" #   Theme by default
 
@@ -73,6 +73,10 @@ class MainController:
 
     def get_windows(self):
         return self.open_windows
+
+
+    def get_user_menu_controller(self):
+        return self.user_menu_controller
 
 
     def get_running(self):
@@ -199,8 +203,8 @@ class MainController:
             #   Decrypt the database to a temporary file when needed
             EncryptionModel.decrypt_db(self.get_dao().get_path_to_db() + "/" + DEFAULT_DB_USER_NAME, master_password, self.get_dao().get_path_to_db() + "/" + DEFAULT_DB_USER_NAME)
             EncryptionModel.decrypt_db(self.get_dao().get_path_to_db() + "/" + DEFAULT_DB_PASSWORD_NAME, master_password, self.get_dao().get_path_to_db() + "/" + DEFAULT_DB_PASSWORD_NAME)
-        except() as e:
-            self.view_utils.os_error_message('Database encryption error', 'Failed to encrypt database files')
+        except Exception as e:
+            self.view_utils.os_error_message('Database encryption error', 'Failed to dencrypt database files (Wrong username)')
             return
 
         if self.get_dao().connect_db() == False:
@@ -217,6 +221,8 @@ class MainController:
                 self.set_running(False)
                 self.get_window("main_window").get_root().quit()
                 self.get_window("main_window").get_root().destroy()
+                if self.get_window("sign_in_window"):
+                    self.get_window("sign_in_window").get_root().destroy()
                 #   Set the password to encrypt databases
                 #//self.get_encryption_manager().set_master_password(master_password)  # Set once
                 self.get_encryption_manager().add_db_path(self.daoConnect.get_path_to_db() + "/" + DEFAULT_DB_USER_NAME)
@@ -224,7 +230,9 @@ class MainController:
                 #   Launch the user menu controller
                 self.set_user_master_password(master_password)
                 self.get_dao().close()
-                UserMenuController(self, self.encryption_manager, username, self.get_dao()).run()
+                self.get_windows().clear()
+                self.user_menu_controller = UserMenuController(self, self.encryption_manager, username, self.get_dao())
+                self.get_user_menu_controller().run()
             else:
                 self.view_utils.os_error_message('Password error', "User denied!")
         except Exception as e: 
@@ -234,9 +242,13 @@ class MainController:
     def theme_change_all(self, new_theme):
         self.set_current_window_theme(new_theme)
         colors = self.view_utils.get_theme_colors_main(new_theme)
-        for view_name  in self.get_windows():
+        try:
+            windows = self.get_windows()
+            windows["user_menu_window"] = self.get_user_menu_controller().get_window("user_menu_window")
+        except Exception as e:
+            pass
+        for view_name in windows:
             self.get_window(view_name).update_theme(colors)
-
 
 if __name__ == "__main__":
     controller = MainController()  # Create an instance of MainController

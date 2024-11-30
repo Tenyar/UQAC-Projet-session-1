@@ -47,9 +47,6 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
         self.root.title("Password Manager [PROTOTYPE]")  # Set title for the main window
 
-        customtkinter.set_appearance_mode('System')
-        customtkinter.set_default_color_theme('green')
-
         self.geometry(f"{525}x{630}")
         self.minsize(MIN_WINDOW_WIDTH, MIN_WINDOW_HEIGHT)
 
@@ -93,12 +90,13 @@ class UserMenuWindowTkinter(customtkinter.CTk):
             hover_color="#9f4250",
             font=("Roboto", BUTTON_FONT_SIZE),
             text_color="black",
+            command=self.on_close,
             cursor="hand2"
         )
         self.button_disconnect.grid(row=0, column=0, sticky="e", padx=(0, DEFAULT_PADDING_Y), pady=(DEFAULT_PADDING_Y, 0))
 
         # Create the TabView below the button
-        self.tabview = customtkinter.CTkTabview(sub_frame, fg_color="gray75", width=500, height=500)
+        self.tabview = customtkinter.CTkTabview(sub_frame, width=500, height=500)
         self.tabview.grid(row=1, column=0, sticky="")
 
         # Customize tab buttons
@@ -133,7 +131,7 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         )
         self.label_service_name_error.grid(row=0, column=0, sticky="w", padx=DEFAULT_PADDING_X, pady=0)
         self.input_service_name = customtkinter.CTkEntry(
-            master=tab, 
+            master=tab,
             placeholder_text="service name", 
             width=DEFAULT_WIDGET_WIDTH, 
             height=DEFAULT_WIDGET_HEIGHT
@@ -151,7 +149,7 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         self.show_generated_password.grid(row=2, column=0, sticky="ew", padx=40, pady=(5, 0))
         self.show_generated_password.insert(0, "Your generated password")
         
-         # Verify paths
+        #   Verify paths
         path_icon_refresh = os.path.abspath(os.path.join(self.base_dir, "../../assets/icon_refresh.png"))
         path_icon_clipboard = os.path.abspath(os.path.join(self.base_dir, "../../assets/icon_clipboard.png"))
        
@@ -163,6 +161,7 @@ class UserMenuWindowTkinter(customtkinter.CTk):
                 text="",
                 width=BUTTON_DEFAULT_WIDTH,
                 image=image_icon_refresh,
+                command=self.show_password,
                 cursor="hand2"
             )
             self.button_refresh_password.grid(row=3, column=0, sticky="e", padx=(0, 40), pady=(2, 0))
@@ -172,6 +171,7 @@ class UserMenuWindowTkinter(customtkinter.CTk):
                 master=tab,
                 text="refresh",
                 width=BUTTON_DEFAULT_WIDTH,
+                command=self.show_password,
                 cursor="hand2"
             )
             self.button_refresh_password.grid(row=3, column=0, sticky="e", padx=(0, 40), pady=(2, 0))
@@ -199,7 +199,7 @@ class UserMenuWindowTkinter(customtkinter.CTk):
             )
             self.button_copy_clipboard.grid(row=3, column=0, sticky="e", padx=(0, 95), pady=(2, 0))
 
-        password_params_frame = customtkinter.CTkFrame(master=tab, fg_color="#E0D0F0", border_width=1, border_color="#691ABC")
+        password_params_frame = customtkinter.CTkFrame(master=tab, border_width=1, border_color="#691ABC")
         password_params_frame.grid(row=4, column=0, padx=40, pady=3, sticky="we")
         password_params_frame.grid_columnconfigure(0, weight=1)
 
@@ -221,7 +221,7 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         )
         label_password_length.grid(row=0, column=0, sticky="w", padx=DEFAULT_PADDING_X, pady=(5, 0))
 
-        alphabet_lowercase_frame = customtkinter.CTkFrame(master=tab, fg_color="#E0D0F0", border_width=1, border_color="#691ABC")
+        alphabet_lowercase_frame = customtkinter.CTkFrame(master=tab, border_width=1, border_color="#691ABC")
         alphabet_lowercase_frame.grid(row=5, column=0, padx=40, pady=3, sticky="we")
         alphabet_lowercase_frame.grid_columnconfigure(0, weight=1)
         self.alphabet_lowercase_switch = customtkinter.CTkSwitch(
@@ -240,7 +240,7 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         )
         label_lowercase_alphabet.grid(row=0, column=0, sticky="w", padx=DEFAULT_PADDING_X, pady=2)
 
-        alphabet_uppercase_frame = customtkinter.CTkFrame(master=tab, fg_color="#E0D0F0", border_width=1, border_color="#691ABC")
+        alphabet_uppercase_frame = customtkinter.CTkFrame(master=tab, border_width=1, border_color="#691ABC")
         alphabet_uppercase_frame.grid(row=6, column=0, padx=40, pady=3, sticky="we")
         alphabet_uppercase_frame.grid_columnconfigure(0, weight=1)
         self.alphabet_uppercase_switch = customtkinter.CTkSwitch(
@@ -259,7 +259,7 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         )
         label_uppercase_alphabet.grid(row=0, column=0, sticky="w", padx=DEFAULT_PADDING_X, pady=2)
 
-        numbers_frame = customtkinter.CTkFrame(master=tab, fg_color="#E0D0F0", border_width=1, border_color="#691ABC")
+        numbers_frame = customtkinter.CTkFrame(master=tab, border_width=1, border_color="#691ABC")
         numbers_frame.grid(row=7, column=0, padx=40, pady=2, sticky="we")
         numbers_frame.grid_columnconfigure(0, weight=1)
         self.numbers_switch = customtkinter.CTkSwitch(
@@ -278,7 +278,7 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         )
         label_numbers.grid(row=0, column=0, sticky="w", padx=DEFAULT_PADDING_X, pady=2)
 
-        special_chars_frame = customtkinter.CTkFrame(master=tab, fg_color="#E0D0F0", border_width=1, border_color="#691ABC")
+        special_chars_frame = customtkinter.CTkFrame(master=tab, border_width=1, border_color="#691ABC")
         special_chars_frame.grid(row=8, column=0, padx=40, pady=3, sticky="we")
         special_chars_frame.grid_columnconfigure(0, weight=1)
         self.special_chars_switch = customtkinter.CTkSwitch(
@@ -297,11 +297,11 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         )
         label_special_chars.grid(row=0, column=0, sticky="w", padx=DEFAULT_PADDING_X, pady=2)
 
-        minimum_numbers_frame = customtkinter.CTkFrame(master=tab, fg_color="#E0D0F0", border_width=1, border_color="#691ABC")
+        minimum_numbers_frame = customtkinter.CTkFrame(master=tab, border_width=1, border_color="#691ABC")
         minimum_numbers_frame.grid(row=9, column=0, padx=40, pady=3, sticky="we")
         minimum_numbers_frame.grid_columnconfigure(0, weight=1)
-        minimum_numbers_spinbox = SpinBoxUtility.FloatSpinbox(self, width=30, frame=minimum_numbers_frame, step_size=1)
-        minimum_numbers_spinbox.set(0)
+        self.minimum_numbers_spinbox = SpinBoxUtility.FloatSpinbox(self, width=30, frame=minimum_numbers_frame, step_size=1)
+        self.minimum_numbers_spinbox.set(0)
         label_minimum_numbers = customtkinter.CTkLabel(
             master=minimum_numbers_frame,
             text="numbers in the password",
@@ -311,11 +311,11 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         )
         label_minimum_numbers.grid(row=0, column=0, sticky="w", padx=DEFAULT_PADDING_X, pady=3)
 
-        minimum_special_chars_frame = customtkinter.CTkFrame(master=tab, fg_color="#E0D0F0", border_width=1, border_color="#691ABC")
+        minimum_special_chars_frame = customtkinter.CTkFrame(master=tab, border_width=1, border_color="#691ABC")
         minimum_special_chars_frame.grid(row=10, column=0, padx=40, pady=3, sticky="we")
         minimum_special_chars_frame.grid_columnconfigure(0, weight=1)
-        minimum_special_chars_spinbox = SpinBoxUtility.FloatSpinbox(self, width=30, frame=minimum_special_chars_frame, step_size=1)
-        minimum_special_chars_spinbox.set(0)
+        self.minimum_special_chars_spinbox = SpinBoxUtility.FloatSpinbox(self, width=30, frame=minimum_special_chars_frame, step_size=1)
+        self.minimum_special_chars_spinbox.set(0)
         label_minimum_special_chars = customtkinter.CTkLabel(
             master=minimum_special_chars_frame,
             text="special characters in the password",
@@ -331,7 +331,7 @@ class UserMenuWindowTkinter(customtkinter.CTk):
             width=100,
             font=("Roboto", BUTTON_FONT_SIZE),
             text_color="black",
-            command=self.submit_generate_password,
+            command=self.show_password,
             cursor="hand2"
         )
         self.button_init.grid(row=11, column=0, sticky="", padx=(5, 150), pady=(DEFAULT_PADDING_Y, 0))
@@ -342,13 +342,28 @@ class UserMenuWindowTkinter(customtkinter.CTk):
             font=("Roboto", BUTTON_FONT_SIZE),
             text_color="black",
             command=self.submit_generate_password,
-            cursor="hand2"
+            cursor="hand2",
+            state="disabled"  # Initially disabled
         )
         self.button_submit.grid(row=11, column=0, sticky="", padx=(150, 5), pady=(DEFAULT_PADDING_Y, 0))
 
 
+    def show_password(self):
+        generated_password = self.get_controller().generate_password(self.get_password_values())
+        self.values["password"] = generated_password
+        if generated_password:
+            #   Temporarily make the Entry writable
+            self.get_password_widget().configure(state="normal")
+            #   Insert the generated password
+            self.get_password_widget().delete(0, "end")  # Clear existing text
+            self.get_password_widget().insert(0, generated_password)
+            #   Make it read-only again
+            self.get_password_widget().configure(state="readonly")
+            self.button_submit.configure(state="normal")
+
+
     def submit_generate_password(self):
-        self.get_controller().generate_password(self.get_password_values())
+        self.get_controller().submit_password_to_db(self.get_value("service_name"), self.get_value("password"))
 
 
     def setup_user_menu_tab(self):
@@ -396,11 +411,12 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         gen_values["generated_password"] = self.show_generated_password.get()
         gen_values["password_length"] = self.slider_password_length.get()
         gen_values["lowercase_alphabet"] = self.alphabet_lowercase_switch.get()
-        gen_values["upppercase_alphabet"] = self.alphabet_uppercase_switch.get()
+        gen_values["uppercase_alphabet"] = self.alphabet_uppercase_switch.get()
         gen_values["numbers"] = self.numbers_switch.get()
         gen_values["special_chars"] = self.special_chars_switch.get()
         gen_values["min_numbers"] = self.minimum_numbers_spinbox.get()
         gen_values["min_special_chars"] = self.minimum_special_chars_spinbox.get()
+        self.values = gen_values
         return gen_values
 
 
@@ -425,9 +441,7 @@ class UserMenuWindowTkinter(customtkinter.CTk):
 
 
     def on_close(self):
-        print("[DEBUG] on_close called [UserMenuWindow]")
         self.view_utils.open_ask_password_window(self.get_root())
-        self.get_controller().set_running(False)
 
 
     def clear_error(self, widget):
@@ -444,6 +458,9 @@ class UserMenuWindowTkinter(customtkinter.CTk):
             self.label_service_name_error.configure(text=error_msg)
             self.input_service_name.configure(border_color="red")
 
+
+    def update_slider_label(self, value, label_name, label_widget):
+        label_widget.configure(text=f"{label_name} {int(float(value))}")
 #   ------------ Theme methods ------------------------------
 #   Change button colors dynamically based on the theme.
     def change_appearance_mode(self, new_appearance_mode: str):
@@ -455,19 +472,17 @@ class UserMenuWindowTkinter(customtkinter.CTk):
 
         # Set the appearance mode globally
         customtkinter.set_appearance_mode(new_appearance_mode)
-        self.get_controller().theme_change_all(new_appearance_mode)
+        self.get_controller().get_main_controller().theme_change_all(new_appearance_mode)
 
 
     def update_theme(self, colors):
         # Define colors for buttons based on the theme
         BUTTON_TEXT_COLOR = colors["button_text_color"]
         TITLE_FG_COLOR = colors["title_fg_color"]
+        print('COLORS : ', BUTTON_TEXT_COLOR)
         # Update button colors dynamically
         self.appearance_mode_optionemenu.configure(text_color=BUTTON_TEXT_COLOR)
-        self.title_frame.configure(fg_color=TITLE_FG_COLOR)
-        self.button_login.configure(text_color=BUTTON_TEXT_COLOR)
-        self.button_sign_in.configure(text_color=BUTTON_TEXT_COLOR)
-
-
-    def update_slider_label(self, value, label_name, label_widget):
-        label_widget.configure(text=f"{label_name} {int(float(value))}")
+        #//self.title_frame.configure(fg_color=TITLE_FG_COLOR)
+        self.button_disconnect.configure(text_color=BUTTON_TEXT_COLOR)
+        self.button_init.configure(text_color=BUTTON_TEXT_COLOR)
+        self.button_submit.configure(text_color=BUTTON_TEXT_COLOR)

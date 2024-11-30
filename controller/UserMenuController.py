@@ -23,6 +23,10 @@ class UserMenuController:
         self.open_windows = {}
 
 
+    def get_main_controller(self):
+        return self.mainController
+
+
     def get_running(self):
         return self.running
 
@@ -59,16 +63,15 @@ class UserMenuController:
             self.get_window("user_menu_window").show_error("service_name_input", "You need to enter a service name!")
             return
 
-        generated_password = self.generator_controller.create_password(service_name, gen_values)
-        #   Temporarily make the Entry writable
-        self.get_window("user_menu_window").get_password_widget().configure(state="normal")
+        generated_password = self.generator_controller.create_password(gen_values)
+        return generated_password
 
-        #   Insert the generated password
-        self.get_window("user_menu_window").get_password_widget().delete(0, "end")  # Clear existing text
-        self.get_window("user_menu_window").get_password_widget().insert(0, generated_password)
 
-        #   Make it read-only again
-        self.get_window("user_menu_window").get_password_widget().configure(state="readonly")
+    def submit_password_to_db(self, service_name, generated_password):
+        if not is_field_not_empty(service_name):
+            self.get_window("user_menu_window").show_error("service_name_input", "You need to enter a service name!")
+            return
+        self.generator_controller.password_to_db(service_name, generated_password)
 
 
     def delete_account(self):
@@ -93,32 +96,32 @@ class UserMenuController:
                     print(f"Error while deleting folder: {e}")
             else:
                 print("Folder not found, nothing to delete.")
-            self.disconnect()
+            self.disconnect(self.get_window())
             # Add logic to validate and delete the account here
-
-
-
         # Print the folder path for verification
         #print(f"Folder path to delete: {folder_path}")
         
         #print("Folder exists:", os.path.exists(folder_path))
 
 
-    def disconnect(self, window, password):
-        #//window.destroy()
+    def change_appearance_mode(self):
+        self.get_main_controller().set_window(self.get_window("user_menu_window"))
+        self.get_main_controller().theme_change_all()
+
+
+    def disconnect(self, password):
         if is_field_not_empty(password):
             #   master password & verify it's authenticity and is veracity
             self.daoConnect.connect_db()
             master_password_db = self.daoConnect.get_fullhashed_master_password(self.username)
             data_hash_db = self.daoConnect.get_hashing_data(self.username)
             if HashModel.verify_password(data_hash_db, password, master_password_db):
-                window.destroy()
-                self.get_window("user_menu_window").get_root().destroy()
-                self.mainController.get_encryption_manager().encrypt_on_exit(password)
-                self.running = False
-                self.mainController.set_running(True)
-                self.mainController.run()
-                return
+                if self.encryption_manager.encrypt_on_exit(password):
+                    self.get_window("user_menu_window").get_root().destroy()
+                    self.set_running(False)
+                    self.mainController.set_running(True)
+                    self.mainController.run()
+                return True
             else:
                 self.view_utils.os_error_message('Password error', "Wrong password")
-                return
+                return False
