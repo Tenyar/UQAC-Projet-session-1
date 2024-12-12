@@ -1,8 +1,6 @@
 #   Utility fonctions for GeneratorController
 #   Involve mainly and only print/input statements
 def get_password_options(params):
-
-    print('test')
     params["password_length"] = input("Enter the password length (8-128): ") 
     if not params["password_length"]:
         params["password_length"] = 16
@@ -25,6 +23,7 @@ def get_password_options(params):
     # Return all the values
     return params
 
+
 def get_boolean_input(prompt):
     while True:
         user_input = input(prompt).strip().lower()  # Stripping extra spaces
@@ -34,3 +33,7 @@ def get_boolean_input(prompt):
             return False
         else:
             print("Invalid input. Please enter 'yes' or 'no'.")  # Retry on invalid input
+
+
+def is_field_not_empty(field_value):
+        return bool(field_value.strip())

@@ -2,6 +2,8 @@
 Gestionnaire de mots de passe
 
 ## Tables de la base de données
-User(#username(UNIQUE), #master_password)
-MasterPassword(#master_password(hashed), timecost, memorycost, parallelism, salt)
-Passwords(#username, site/app (name), password(hashed), {Url du site?, description du site?})
+User(#username(UNIQUE), #full_hashed_password)
+
+PasswordData(#username, algorithm, version, memorycost, timecost, parallelism, salt, hash_len, salt_len, split_hashed_password)
+
+UserData(#username, service_name, password)

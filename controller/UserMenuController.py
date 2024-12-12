@@ -4,7 +4,6 @@ import view.window.UserMenuWindowTkinter as user_menu_window
 from GeneratorController import GeneratorController
 from ChestController import ChestController
 from model.HashModel import HashModel
-from model.GeneratorModel import GeneratorModel
 from utility.ViewFunctionsUtility import ViewFunctionsUtility
 from utility.functionUtility import is_field_not_empty
 
@@ -15,6 +14,7 @@ class UserMenuController:
         self.encryption_manager = EncryptionManager
         self.mainController = mainController
         self.generator_controller = GeneratorController(self, self.username)
+        self.chest_controller = ChestController(self, self.username)
         self.running = True
         self.daoConnect = dao
         self.daoConnect.close()
@@ -25,6 +25,14 @@ class UserMenuController:
 
     def get_main_controller(self):
         return self.mainController
+
+
+    def get_generator_controller(self):
+        return self.generator_controller
+    
+
+    def get_chest_controller(self):
+        return self.chest_controller
 
 
     def get_running(self):
@@ -63,7 +71,7 @@ class UserMenuController:
             self.get_window("user_menu_window").show_error("service_name_input", "You need to enter a service name!")
             return
 
-        generated_password = self.generator_controller.create_password(gen_values)
+        generated_password = self.get_generator_controller().create_password(gen_values)
         return generated_password
 
 
@@ -71,20 +79,17 @@ class UserMenuController:
         if not is_field_not_empty(service_name):
             self.get_window("user_menu_window").show_error("service_name_input", "You need to enter a service name!")
             return
-        self.generator_controller.password_to_db(service_name, generated_password)
+        self.get_generator_controller().password_to_db(service_name, generated_password)
 
 
-    def delete_account(self):
+    def delete_account(self, password):
         self.daoConnect.close()
-        self.ViewFunctionsUtility.open_ask_password_window()
-        # Wait for the password window to close
-        if self.ViewFunctionsUtility.getget_window("ask_password_window") is not None:
-            self.ViewFunctionsUtility.getget_window("ask_password_window").wait_window()
-
-        # Process the password or cancellation
-        if self.password_input is None:
-            print("Action canceled by the user.")
-        else:
+        #   master password & verify it's authenticity and is veracity
+        self.daoConnect.connect_db()
+        master_password_db = self.daoConnect.get_fullhashed_master_password(self.username)
+        data_hash_db = self.daoConnect.get_hashing_data(self.username)
+        if HashModel.verify_password(data_hash_db, password, master_password_db):
+            self.daoConnect.close()
             project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))  #    Climb up one level to reach the root
             folder_path = os.path.join(project_root, 'model', 'database', self.username)
             if os.path.exists(folder_path):
@@ -92,16 +97,52 @@ class UserMenuController:
                     # Use shutil.rmtree to delete the folder and all contents
                     shutil.rmtree(folder_path)
                     print("Account folder and contents successfully deleted.")
+                    self.get_window("user_menu_window").get_root().destroy()
+                    self.set_running(False)
+                    self.mainController.set_running(True)
+                    self.mainController.run()
+                    return True
                 except Exception as e:
                     print(f"Error while deleting folder: {e}")
+                    return False
             else:
                 print("Folder not found, nothing to delete.")
-            self.disconnect(self.get_window())
-            # Add logic to validate and delete the account here
-        # Print the folder path for verification
-        #print(f"Folder path to delete: {folder_path}")
-        
-        #print("Folder exists:", os.path.exists(folder_path))
+                return False
+        else:
+            self.view_utils.os_error_message('Password error', "Wrong password")
+            return False
+
+
+    def delete_chest_service(self, service_name,  password):
+        password_cleaned = password[len("[Password]: "):].strip()
+        service_name_cleaned = service_name[len("Service: "):].strip()
+        if self.chest_controller.delete_service(self.get_username(), service_name_cleaned, password_cleaned) == False:
+            self.view_utils.os_error_message("DB ERROR", "deleting the service resulted in error from the database")
+            return False
+        return True
+
+
+    def show_service_password(self):
+        user_passwords = self.get_chest_controller().show_all_user_passwords()
+        if user_passwords:
+            return user_passwords
+        else:
+            return None
+
+
+    def entropy_verification(self):
+        entropy_factor = self.get_generator_controller().get_generator_model().get_entropy()
+        if entropy_factor >= 127:
+            args = ["green", round(entropy_factor)]
+        elif entropy_factor >= 70:
+            args = ["light green", round(entropy_factor)]
+        elif entropy_factor >= 50:
+            args = ["yellow", round(entropy_factor)]
+        elif entropy_factor >= 28:
+            args = ["orange", round(entropy_factor)]
+        else:
+            args = ["red", round(entropy_factor)]
+        return args
 
 
     def change_appearance_mode(self):

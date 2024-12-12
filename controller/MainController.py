@@ -14,7 +14,6 @@ from utility.ViewFunctionsUtility import ViewFunctionsUtility
 from UserMenuController import UserMenuController
 from model.DAO import DAO
 from model.HashModel import HashModel
-from getpass import getpass # Utility to hide inputs when writing a password
 from model.UserModel import UserModel # Argond2(id) is used in this prototype for better security (longer time for hash)
 from model.EncryptionModel import EncryptionModel
 from model.EncryptionManager import EncryptionManager
@@ -108,7 +107,6 @@ class MainController:
 
     def run(self):
         while self.get_running():
-            #   Call the utility function to display the menu
             self.set_window("main_window", main_window.MainWindowTkinter(self))
             self.get_window("main_window").get_root().mainloop()
 
@@ -169,7 +167,6 @@ class MainController:
         self.get_dao().create_db()
 
         #   Add the master password for the encryption + path of the files to be encrypted
-        #//self.get_encryption_manager().set_master_password(master_password)
         self.get_encryption_manager().add_db_path(self.daoConnect.get_path_to_db() + "/" + DEFAULT_DB_USER_NAME)
         self.get_encryption_manager().add_db_path(self.daoConnect.get_path_to_db() + "/" + DEFAULT_DB_PASSWORD_NAME)
 
@@ -186,7 +183,6 @@ class MainController:
 
 
     def connect_login(self):
-        #   Variables
         username = self.get_window("main_window").get_value("username")
         master_password = self.get_window("main_window").get_value("master_password")
 
@@ -224,7 +220,6 @@ class MainController:
                 if self.get_window("sign_in_window"):
                     self.get_window("sign_in_window").get_root().destroy()
                 #   Set the password to encrypt databases
-                #//self.get_encryption_manager().set_master_password(master_password)  # Set once
                 self.get_encryption_manager().add_db_path(self.daoConnect.get_path_to_db() + "/" + DEFAULT_DB_USER_NAME)
                 self.get_encryption_manager().add_db_path(self.daoConnect.get_path_to_db() + "/" + DEFAULT_DB_PASSWORD_NAME)
                 #   Launch the user menu controller

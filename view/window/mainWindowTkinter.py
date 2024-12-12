@@ -65,15 +65,12 @@ class MainWindowTkinter(customtkinter.CTk):
             font=("Roboto", TITLE_FONT_SIZE)
         )
         title_label.pack(pady=10)  # Spacing around text
-
         #   Main frame with margins to center the content
         main_frame = customtkinter.CTkFrame(master=self.get_root())
         main_frame.pack(fill="both", expand=True)
-
         #   Create a frame for input fields and labels
         input_label_frame = customtkinter.CTkFrame(master=main_frame)
         input_label_frame.pack(pady=DEFAULT_PADDING_Y, padx=DEFAULT_PADDING_X, expand=True)
-        
         #   Row 0: Theme option selector
         #   Frame for changing the application themes
         self.appearance_mode_optionemenu = customtkinter.CTkOptionMenu(
@@ -84,7 +81,6 @@ class MainWindowTkinter(customtkinter.CTk):
             text_color="black"
             )
         self.appearance_mode_optionemenu.grid(row=0, column=0, sticky="w", padx=DEFAULT_PADDING_X, pady=(DEFAULT_PADDING_Y, 0))
-        
         #   Define the image path
         path_icon_app = os.path.join(self.base_dir, "../../assets/icon_app_v2.png")
         #   Row 1: Text paragraph
@@ -101,7 +97,6 @@ class MainWindowTkinter(customtkinter.CTk):
             text=""
         )
         label_with_image.grid(row=1, column=0, sticky="", padx=DEFAULT_PADDING_X, pady=0)
-        
         #   Row 2: Text paragraph
         paragraph_text = (
             "Welcome to the password manager!\n"
@@ -116,7 +111,6 @@ class MainWindowTkinter(customtkinter.CTk):
             wraplength=DEFAULT_WIDGET_WIDTH  # Limits the width of the text so that it displays on multiple lines
         )
         paragraph_label.grid(row=2, column=0, sticky="", padx=DEFAULT_PADDING_X, pady=(MAIN_PARAGRAPH_PADDING_TOP_Y, DEFAULT_PADDING_Y))
-        
         #   Row 3-4: Username input
         self.label_username_error = customtkinter.CTkLabel(
             master=input_label_frame,
@@ -152,7 +146,6 @@ class MainWindowTkinter(customtkinter.CTk):
             show="*"
             )
         self.input_field_password.grid(row=6, column=0, sticky="", padx=DEFAULT_PADDING_X, pady=0)
-
         #   Row7: Label with text and image
         path_icon_info = os.path.join(self.base_dir, "../../assets/icon_info.png")
         try:
@@ -172,7 +165,6 @@ class MainWindowTkinter(customtkinter.CTk):
         label_with_image.grid(row=7, column=0, sticky="w", padx=DEFAULT_PADDING_X, pady=(5,5))
         
         input_label_frame.grid_columnconfigure(0, weight=1)
-
         #   Row 8: Buttons / Submit buttons
         self.button_sign_in = customtkinter.CTkButton(
             master=input_label_frame,
@@ -193,7 +185,7 @@ class MainWindowTkinter(customtkinter.CTk):
             text_color="black"
         )
         self.button_login.grid(row=8, column=0, sticky="e", padx=(5, 5), pady=(0, DEFAULT_PADDING_Y))
-            #   Bind events to clear the error when the user types
+        #   Bind events to clear the error when the user types
         self.input_field_username.bind("<KeyRelease>", lambda event: self.clear_error("username_input"))
         self.input_field_password.bind("<KeyRelease>", lambda event: self.clear_error("master_password_input"))
 

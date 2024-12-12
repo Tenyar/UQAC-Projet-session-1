@@ -29,7 +29,7 @@ from utility.ConstantsUtility import (
 
 #   Utility class for hashing functions
 class HashModel:
-    def __init__(self,):
+    def __init__(self):
         #    self.full_hash_value = full_hash_value
         #    self.ph = argon2.PasswordHasher()  # Initialize PasswordHasher
         return
@@ -113,7 +113,8 @@ class HashModel:
         )
         
         return validated_params
-    
+
+
     @staticmethod
     # ? Peut on mettre cette méthode en static pour être utilitaire à d'autre mdp comme ceux des sites ? (évite d'en avoir deux)
     def split_password(hash_params, full_hashed_value):

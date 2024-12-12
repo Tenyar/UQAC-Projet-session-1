@@ -32,3 +32,4 @@ MAX_SALT_LEN = 32  # Max length of the salt
 DEFAULT_PASSWORD_LENGTH = 16
 MAX_PASSWORD_LENGTH = 128
 MIN_PASSWORD_LENGTH = 8
+MAX_ENTROPY = 91 #  Sum of all character pools

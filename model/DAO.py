@@ -352,7 +352,7 @@ class DAO:
             # Prepared statement to get the user's details
             self.get_db_cursor(DEFAULT_DB_USER_NAME)
             self.cursor.execute('''
-                SELECT service_name FROM UserData WHERE username = ?
+                SELECT * FROM UserData WHERE username = ?
             ''', (username,))
             
             result = self.cursor.fetchall()  # Fetch the result (None if no result) 
@@ -365,6 +365,17 @@ class DAO:
 
         return result
 
+
+    def delete_service(self, username: str, service_name: str, password: str):
+        try:
+            self.get_db_cursor(DEFAULT_DB_USER_NAME)
+            self.cursor.execute('''
+                DELETE FROM UserData WHERE username = ? AND service_name = ? AND password = ?
+            ''', (username, service_name.lstrip(), password.lstrip()))
+            self.connection_user.commit()
+            return True
+        except sqlite3.IntegrityError as e:
+            return False
 
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////
 #   Setters
@@ -457,5 +468,7 @@ class DAO:
             self.connection_user.commit()
 
             print(f"User {user.get_username()} deleted from the database.")
+            return True
         except sqlite3.IntegrityError as e:
             print(f"Error occurred: {e}")
+            return False
