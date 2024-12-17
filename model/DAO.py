@@ -1,4 +1,3 @@
-#   https://docs.python.org/3/library/sqlite3.html (lien vers la doc sqlite3 pour python)
 import sqlite3
 import os
 
@@ -115,7 +114,7 @@ class DAO:
                 service_name TEXT NOT NULL,
                 password TEXT NOT NULL
             ) 
-        ''')    # FOREIGN KEY(username) REFERENCES User(username)
+        ''')
         self.connection_user.commit()
 #//////////////////////////////////////////////////////////////////////////////////////////////////////////
 #   Getters
@@ -311,7 +310,7 @@ class DAO:
 # password 
     def get_all_user_service_password(self, username: str):
         try:
-            # Prepared statement to get the user's details
+            #   Prepared statement to get the user's details
             self.get_db_cursor(DEFAULT_DB_USER_NAME)
             self.cursor.execute('''
                 SELECT service_name, password FROM UserData WHERE username = ?
@@ -330,7 +329,7 @@ class DAO:
 
     def get_user_service_password(self, username: str, service: str):
         try:
-            # Prepared statement to get the user's details
+            #   Prepared statement to get the user's details
             self.get_db_cursor(DEFAULT_DB_USER_NAME)
             self.cursor.execute('''
                 SELECT service_name, password FROM UserData WHERE username = ? AND service_name = ?
@@ -349,13 +348,13 @@ class DAO:
     
     def get_all_services(self, username: str):
         try:
-            # Prepared statement to get the user's details
+            #   Prepared statement to get the user's details
             self.get_db_cursor(DEFAULT_DB_USER_NAME)
             self.cursor.execute('''
                 SELECT * FROM UserData WHERE username = ?
             ''', (username,))
             
-            result = self.cursor.fetchall()  # Fetch the result (None if no result) 
+            result = self.cursor.fetchall()
             
             if not result:
                 print(f"\nUser {username} not found.\n")
@@ -391,15 +390,15 @@ class DAO:
 
     def create_user(self, user: object):
         try:
-            # Insert into MasterPassword (User) table
-            # and not 'user.hash_password'
+            #   Insert into MasterPassword (User) table
+            #   and not 'user.hash_password'
             self.get_db_cursor(DEFAULT_DB_PASSWORD_NAME)
             self.cursor.execute('''
                 INSERT INTO User (username, full_hashed_password) 
                 VALUES (?, ?)
             ''', (user.get_username(), user.get_full_hash_password()))
 
-            # Insert into PasswordData (Hashed password splited) table
+            #   Insert into PasswordData (Hashed password splited) table
             self.cursor.execute('''
                 INSERT INTO PasswordData (username, algorithm, version, memorycost, timecost, parallelism, salt, hash_len, salt_len, split_hashed_password) 
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -429,7 +428,7 @@ class DAO:
         HashModel.split_password(user.get_all_params(), new_hash)
 
         try:
-            # Update the master password
+            #   Update the master password
             self.get_db_cursor(DEFAULT_DB_PASSWORD_NAME)
             self.cursor.execute('''
                 UPDATE User SET master_password = ? WHERE username = ?
@@ -448,8 +447,8 @@ class DAO:
 
     def delete_user(self, user: object):
         try:
-            # Delete from PasswordData first to maintain referential integrity (since it has a foreing key to username)
-            # Then delete the user
+            #   Delete from PasswordData first to maintain referential integrity (since it has a foreing key to username)
+            #   Then delete the user
             self.get_db_cursor(DEFAULT_DB_PASSWORD_NAME)
             self.cursor.execute('''
                 DELETE FROM PasswordData WHERE username = ?
@@ -461,7 +460,7 @@ class DAO:
             self.connection_pswd.commit()
 
             self.get_db_cursor(DEFAULT_DB_USER_NAME)
-            # Then delete the user
+            #   Then delete the user
             self.cursor.execute('''
                 DELETE FROM UserData WHERE username = ?
             ''', (user.get_username(),))

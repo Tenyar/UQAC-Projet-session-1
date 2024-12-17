@@ -1,12 +1,4 @@
-import hashlib
-import argon2
-import sys
-import os
-
 from model.HashModel import HashModel
-
-#sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-#from model.DAO import DAO
 
 
 class UserModel:

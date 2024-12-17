@@ -4,7 +4,6 @@ from utility.ViewFunctionsUtility import ViewFunctionsUtility
 class EncryptionManager:
     def __init__(self):
         self.db_paths = []
-        #self.master_password = None
 
 
     def add_db_path(self, db_path):
@@ -20,5 +19,4 @@ class EncryptionManager:
                 encrypted_path = db_path
                 EncryptionModel.encrypt_db(db_path, password, encrypted_path)
             return True
-            #    print(f"Encrypted {db_path} to {encrypted_path}")
         return False

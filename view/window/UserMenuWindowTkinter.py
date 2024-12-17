@@ -215,6 +215,7 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         self.progressbar_entropy = customtkinter.CTkProgressBar(self.entropie_progressbar_frame)
         self.progressbar_entropy.grid(row=0, column=0, padx=(150, 0), pady=0, sticky="ew")
         self.progressbar_entropy.set(0)
+        self.reset_entropy()
 
         password_params_frame = customtkinter.CTkFrame(master=tab, border_width=1, border_color="#691ABC")
         password_params_frame.grid(row=5, column=0, padx=40, pady=3, sticky="we")
@@ -375,6 +376,12 @@ class UserMenuWindowTkinter(customtkinter.CTk):
             self.alphabet_lowercase_switch.select()
 
 
+    def reset_entropy(self):
+        self.progressbar_entropy.set(0)
+        self.progressbar_entropy.configure(progress_color="gray60")
+        self.label_entropy.configure(text=f"Entropy :")
+
+
     def update_entropy(self):
         args = self.get_controller().entropy_verification()
         progress = min(args[1] / MAX_PASSWORD_LENGTH, 1)  #  Ensure value is between 0 and 1
@@ -405,6 +412,7 @@ class UserMenuWindowTkinter(customtkinter.CTk):
         self.get_password_widget().configure(state="normal")
         self.input_generated_password.delete(0, "end")
         self.get_password_widget().configure(state="readonly")
+        self.reset_entropy()
         self.fill_chest(self.chest_scrollable_frame)
 
 
@@ -430,7 +438,7 @@ class UserMenuWindowTkinter(customtkinter.CTk):
 
 
     def suppress_account(self):
-        self.view_utils.open_ask_password_window("suppress_account", self.get_root())
+        self.view_utils.open_ask_password_window("suppress_account")
 
 
     def setup_chest_tab(self):

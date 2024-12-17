@@ -15,9 +15,6 @@ class ChestController:
         password_list = self.daoConnect.get_all_user_service_password(self.username)
         self.daoConnect.close()
         return password_list
-        # Iterate over each tuple and print it in dictionary format
-       #for service, password in password_list:
-       #    print(f"---> Service: {service}, Password: {password}")
         
 
     def delete_service(self, username, service_name, password):

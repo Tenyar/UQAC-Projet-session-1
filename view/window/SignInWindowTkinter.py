@@ -52,10 +52,6 @@ class SignInWindowTkinter(customtkinter.CTk):
         self.root.title("Sign in [PROTOTYPE]")
         self.view_utils = ViewFunctionsUtility(self)
 
-        # //  Ensure the window is on top and grabs focus
-       # //self.root.attributes("-topmost", False)
-       # //self.root.focus_force()
-
         #   Set up window closing behavior
         self.root.protocol("WM_DELETE_WINDOW", self.on_close)
         #   Window size
@@ -399,7 +395,7 @@ class SignInWindowTkinter(customtkinter.CTk):
     def on_close(self):
         #   Handle window close event.
         self.controller.del_window("sign_in_window")
-        self.root.destroy()  # Destroys the window and resources
+        self.root.destroy()  #  Destroys the window and resources
 
 
 #   ------------ Slider method ----------------------------
@@ -415,7 +411,7 @@ class SignInWindowTkinter(customtkinter.CTk):
 
 #   ------------ Theme method ------------------------------
     def update_theme(self, colors):
-        # Hide the window temporarily (prettier)
+        #   Hide the window temporarily (prettier)
         self.view_utils.hide_window(self)
 
         BUTTON_TEXT_COLOR = colors["button_text_color"]
