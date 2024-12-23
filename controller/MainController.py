@@ -2,7 +2,7 @@
 import sys
 import os
 sys.path.insert(1, os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-import view.window.MainWindowTkinter as main_window
+import view.window.mainWindowTkinter as main_window
 import view.window.SignInWindowTkinter as sign_in_window
 
 #   Importing DAO constants
