@@ -7,6 +7,9 @@ MasterPassword(#master_password(hashed), timecost, memorycost, parallelism, salt
 Passwords(#username, site/app (name), password(hashed), {Url du site?, description du site?})
 
 ## Packages requirements
-Pour ce gestionnaire de mot de passe, il faut avoir ces packages d'installés :__
-pip install cryptography__
-pip install argon2-cffi__
+
+Pour ce gestionnaire de mot de passe, il faut avoir ces packages d'installés :
+
+```bash
+pip install cryptography
+pip install argon2-cffi
