@@ -13,6 +13,9 @@ Pour ce gestionnaire de mot de passe, il faut avoir ces packages d'installés :
 ```bash
 pip install cryptography
 pip install argon2-cffi
+pip install customtkinter
+pip install Pillow
+pip install pyperclip
 ```
 
 Ensuite il faut lancé l'application depuis la racine du projet :
