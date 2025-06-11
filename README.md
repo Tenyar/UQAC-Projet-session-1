@@ -2,8 +2,22 @@
 Gestionnaire de mots de passe
 
 ## Tables de la base de données
-User(#username(UNIQUE), #full_hashed_password)
+User(#username(UNIQUE), #master_password)
+MasterPassword(#master_password(hashed), timecost, memorycost, parallelism, salt)
+Passwords(#username, site/app (name), password(hashed), {Url du site?, description du site?})
 
-PasswordData(#username, algorithm, version, memorycost, timecost, parallelism, salt, hash_len, salt_len, split_hashed_password)
+## Packages requirements
 
-UserData(#username, service_name, password)
+Pour ce gestionnaire de mot de passe, il faut avoir ces packages d'installés :
+
+```bash
+pip install cryptography
+pip install argon2-cffi
+```
+
+Ensuite il faut lancé l'application depuis la racine du projet :
+
+```bash
+cd \UQAC-Projet-session-1
+python controller/MainController.py
+```
