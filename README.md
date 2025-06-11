@@ -13,12 +13,11 @@ Pour ce gestionnaire de mot de passe, il faut avoir ces packages d'installés :
 ```bash
 pip install cryptography
 pip install argon2-cffi
+```
 
 Ensuite il faut lancé l'application depuis la racine du projet :
-## Packages requirements
-
-Pour ce gestionnaire de mot de passe, il faut avoir ces packages d'installés :
 
 ```bash
 cd \UQAC-Projet-session-1
 python controller/MainController.py
+```
