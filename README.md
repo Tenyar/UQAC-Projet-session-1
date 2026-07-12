@@ -9,12 +9,12 @@ Cryptography (chiffrement des données)
 SQLite/MySQL (persistance)
 
 ## Fonctionnalités principales
-✅ Génération de mots de passe aléatoires avec analyse d'entropie
-✅ Hachage sécurisé du master password (Argon2id)
-✅ Chiffrement des mots de passe stockés
-✅ Interface GUI avec CustomTKinter
-✅ Interface CLI alternative
-✅ Persistance en fichier
+- Génération de mots de passe aléatoires avec analyse d'entropie
+- Hachage sécurisé du master password (Argon2id)
+- Chiffrement des mots de passe stockés
+- Interface GUI avec CustomTKinter
+- Interface CLI alternative
+- Persistance en fichier
 
 ## Tables de la base de données
 User(#username(UNIQUE), #master_password)
